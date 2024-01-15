@@ -24,6 +24,21 @@ export const getRestaurant = async (params: any) => {
   return res.data;
 };
 
+export const getAdmins = async (params: any) => {
+  const res = await axios.get(`${basePath}/admins`, params);
+  return res.data;
+};
+
+export const createAdmins = async (data: any, config: any) => {
+  const res = await axios.post(`${basePath}/admins`, data, config);
+  return res.data;
+};
+
+export const getNodes = async (params: any) => {
+  const res = await axios.get(`${basePath}/nodes`, params);
+  return res.data;
+};
+
 export const createRestaurant = async (data: any, config: any) => {
   const res = await axios.post(`${restaurantBasePath}/restaurants`, data, config);
   return res.data;
