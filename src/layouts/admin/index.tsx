@@ -24,11 +24,7 @@ export default function Admin(props: { [x: string]: any }) {
   const getActiveRoute = (routes: RoutesType[]): string | boolean => {
     let activeRoute = "Main Dashboard";
     for (let i = 0; i < routes.length; i++) {
-      if (
-        window.location.href.indexOf(
-          routes[i].layout + "/" + routes[i].path
-        ) !== -1
-      ) {
+      if (window.location.href.indexOf(routes[i].layout + "/" + routes[i].path) !== -1) {
         setCurrentRoute(routes[i].name);
       }
     }
@@ -37,9 +33,7 @@ export default function Admin(props: { [x: string]: any }) {
   const getActiveNavbar = (routes: RoutesType[]): string | boolean => {
     let activeNavbar = false;
     for (let i = 0; i < routes.length; i++) {
-      if (
-        window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1
-      ) {
+      if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
         return routes[i].secondary;
       }
     }
@@ -48,9 +42,7 @@ export default function Admin(props: { [x: string]: any }) {
   const getRoutes = (routes: RoutesType[]): any => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
-        return (
-          <Route path={`/${prop.path}`} element={prop.component} key={key} />
-        );
+        return <Route path={`/${prop.path}`} element={prop.component} key={key} />;
       } else {
         return null;
       }
@@ -64,9 +56,7 @@ export default function Admin(props: { [x: string]: any }) {
       {/* Navbar & Main Content */}
       <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
         {/* Main Content */}
-        <main
-          className={`mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]`}
-        >
+        <main className={`mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[313px]`}>
           {/* Routes */}
           <div className="h-full">
             <Navbar
@@ -79,10 +69,7 @@ export default function Admin(props: { [x: string]: any }) {
               <Routes>
                 {getRoutes(routes)}
 
-                <Route
-                  path="/"
-                  element={<Navigate to="/admin/order-management" replace />}
-                />
+                <Route path="/" element={<Navigate to="/admin/manage" replace />} />
               </Routes>
             </div>
             <div className="p-3">
