@@ -1,148 +1,88 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { restaurantApi, getNodes, createAdmins, basePath, updateTable } from "api";
-import { Table, Button, Modal, Tag, Input, DatePicker, Space, Pagination } from "antd";
-import { toTimestamp } from "../../../utils/utils";
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from "react";
+import { basePath } from "api";
+import { Table, Button, Modal, Tag, Input } from "antd";
+import { useDispatch, useSelector } from "react-redux";
 import { RiAddFill } from "react-icons/ri";
-import { AppDispatch } from '../../../store';
-import { getRestaurantInfo } from "../../../features/restaurant/restaurantActions";
-import { defaultImage } from "../../../utils/constant";
-import { NavLink, useNavigate } from 'react-router-dom';
+import { AppDispatch } from "../../../store";
+import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
-import sha256 from 'crypto-js/sha256';
 
-
-import {
-  AdminApi,
-  Configuration,
-  ConfigurationParameters,
-  NodeApi
-} from "@universalmacro/core-ts-sdk";
+import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 
 const paginationConfig = {
   pageSize: 10,
   page: 0,
-}
-
+};
 
 const Tables = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [tagFilters, setTagFilters] = useState([]);
+  const [nodeApi, setNodeApi] = useState(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({});
-  const { userToken } = useSelector((state: any) => state.auth) || localStorage.getItem('admin-web-token') || {};
-  const { restaurantList, restaurantId, restaurantInfo } = useSelector((state: any) => state.restaurant) || {};
-  const [dataSource, setDataSource] = useState(restaurantInfo?.items);
+  const { userToken, userInfo } =
+    useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
+  const { restaurantList, restaurantId, restaurantInfo } =
+    useSelector((state: any) => state.restaurant) || {};
+  const [dataSource, setDataSource] = useState([]);
   const navigate = useNavigate();
 
   const { confirm } = Modal;
 
-
-
-  // useEffect(() => {
-  //   setDataSource(restaurantInfo?.items);
-  //   let filters: any = [];
-  //   restaurantInfo?.categories?.map((e: any) => {
-  //     filters.push({ text: e, value: e });
-  //   })
-  //   setTagFilters(filters);
-  // }, [restaurantId]);
-
   const onChangePage = (page: number, pageSize: number) => {
     getNodeList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
-  }
-
+  };
 
   const getNodeList = async (page: number, pageSize: number) => {
-
-    const nodeApi = new NodeApi(
-      new Configuration({
-        basePath: basePath,
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      } as ConfigurationParameters)
-    );
-
-
+    setLoading(true);
     try {
       let pagination = {
         index: page ?? paginationConfig?.page,
         limit: pageSize ?? paginationConfig?.pageSize,
       };
-      // const res = await getNodes({
-      //   headers: getHeaders(),
-      //   params: { ...pagination },
-      // });
-
-      const res = await nodeApi.listNode({ ...pagination });
+      const res = await nodeApi?.listNode({ ...pagination });
       setDataSource(res?.items);
+      setLoading(false);
     } catch (e) {
-      console.log("getNodeList", e);
+      setLoading(false);
     }
-
-  }
+  };
 
   useEffect(() => {
+    if (!nodeApi) {
+      setNodeApi(
+        new NodeApi(
+          new Configuration({
+            basePath: basePath,
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          } as ConfigurationParameters)
+        )
+      );
+    }
     getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
-  }, [userToken]);
-
-  // useEffect(() => {
-  //   console.log("useEffectuseEffectuseEffect", restaurantInfo?.items);
-  //   setDataSource(restaurantInfo?.items);
-  // }, restaurantInfo?.items);
-
-  // useEffect(() => {
-  //   dispatch(getRestaurantInfo({ token: userToken }));
-  // }, []);
-
-
-  const getHeaders = () => {
-    return {
-      'Content-Type': 'application/json;charset=UTF-8',
-      'Authorization': `Bearer ${userToken}`,
-    };
-  }
+  }, [nodeApi, userInfo?.id, userToken]);
 
   const onSave = async (values: any) => {
-    console.log("onSave===================", values);
-    const adminApi = new AdminApi(
-      new Configuration({
-        basePath: basePath,
-        headers: {
-          Authorization: `Bearer ${userToken}`,
+    try {
+      const res = await nodeApi.createNode({
+        createNodeRequest: {
+          name: values?.name,
+          description: values?.description,
         },
-      } as ConfigurationParameters)
-    );
-
-
-    try {
-      const res = await createAdmins({ ...values, password: sha256(sha256(values?.password).toString()).toString() }, {
-        headers: getHeaders()
       });
-      // const res = await adminApi.createAdmin({ ...values });
-    } catch (e) {
-
-    }
+      successCallback();
+      getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
+    } catch (e) {}
     setVisible(false);
-  }
+  };
 
-  const onUpdate = async (values: any) => {
-    console.log(values);
-    try {
-      const res = await updateTable(values.id, { label: values.label }, {
-        headers: getHeaders()
-      });
-      dispatch(getRestaurantInfo({ token: userToken }));
-    } catch (e) {
-
-    }
-    setVisible(false);
-  }
-
-
-
+  const successCallback = () => {
+    Modal.success({
+      content: "創建成功！",
+    });
+  };
 
   const handleDelete = (record: any) => {
     showDeleteConfirm(async () => {
@@ -152,114 +92,97 @@ const Tables = () => {
       //   });
       //   console.log("handleDelete", res);
       // } catch (e) {
-
       // }
-
-    }
-
-
-    );
-  }
+    });
+  };
 
   const showDeleteConfirm = (onOk: any) => {
     confirm({
-      title: '確認刪除？',
+      title: "確認刪除？",
       // icon: <ExclamationCircleFilled />,
       // content: '確認刪除？',
-      okText: '確認',
-      okType: 'danger',
-      cancelText: '取消',
+      okText: "確認",
+      okType: "danger",
+      cancelText: "取消",
       onOk,
       onCancel() {
-        console.log('OK');
+        console.log("OK");
       },
     });
   };
 
   const search = (value: string) => {
-    if (value === '') {
+    if (value === "") {
       getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
       return;
     }
 
     const filterTable = dataSource?.filter((o: any) =>
-      Object.keys(o).some(k =>
-        String(o[k])
-          .toLowerCase()
-          .includes(value.toLowerCase())
-      )
+      Object.keys(o).some((k) => String(o[k]).toLowerCase().includes(value.toLowerCase()))
     );
 
     setDataSource(filterTable);
   };
 
-
   const addPerson = () => {
     setVisible(true);
-  }
-
-
+  };
 
   const colums = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: '10%',
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: "10%",
     },
     {
-      title: '賬號',
-      dataIndex: 'account',
-      key: 'account',
-      width: '10%',
+      title: "節點名稱",
+      dataIndex: "name",
+      key: "name",
+      width: "10%",
     },
     {
-      title: '提交時間',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      width: '20%',
-      render: (text: any, record: any) => (
-        <>
-          {new Date(text * 1000).toLocaleString()}
-        </>
-      ),
-    },
-    {
-      title: '更新時間',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      width: '20%',
-      render: (text: any, record: any) => (
-        <>
-          {new Date(text * 1000).toLocaleString()}
-        </>
-      ),
-    },
-    {
-      title: "角色",
-      dataIndex: "role",
-      key: 'role',
-      width: '15%',
-      onFilter: (value: any, record: any) => record.status === value,
-      filterSearch: false,
-      render: (text: string, record: any) => {
-        let color = text === 'ROOT' ? 'geekblue' : 'cyan';
-        return (<Tag color={color} key={text}>
-          {text}
-        </Tag>);
+      title: "描述",
+      dataIndex: "description",
+      key: "description",
+      width: "20%",
+      render: (text: any, record: any) => {
+        if (!text) {
+          return <>無</>;
+        } else {
+          return <>{text}</>;
+        }
       },
     },
     {
-      title: '操作',
-      key: 'operation',
-      render: (text: any, record: any) => (<><a className="text-blue-400 mr-4">編輯</a>
-        <a className="text-red-400" onClick={() => handleDelete(record)}>刪除</a></>),
+      title: "提交時間",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: "20%",
+      render: (text: any, record: any) => <>{new Date(text * 1000).toLocaleString()}</>,
+    },
+    {
+      title: "更新時間",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      width: "20%",
+      render: (text: any, record: any) => <>{new Date(text * 1000).toLocaleString()}</>,
+    },
+
+    {
+      title: "操作",
+      key: "operation",
+      render: (text: any, record: any) => (
+        <>
+          <a className="text-red-400" onClick={() => handleDelete(record)}>
+            刪除
+          </a>
+        </>
+      ),
     },
   ];
 
-
   return (
-
     <div>
       <ModalForm
         state={formValues}
@@ -270,24 +193,30 @@ const Tables = () => {
         }}
       />
 
-
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <div>
-          <div className="flex justify-between"><p className="text-xl mb-4 inline">節點列表</p> <Button onClick={addPerson} icon={<RiAddFill />}>新增</Button></div>
+          <div className="flex justify-between">
+            <p className="mb-4 inline text-xl">節點列表</p>{" "}
+            <Button onClick={addPerson} icon={<RiAddFill />}>
+              新增
+            </Button>
+          </div>
           <Input.Search
             style={{ margin: "0 0 10px 0" }}
             placeholder="請輸入 ID / 角色 / 賬號 等搜索..."
             enterButton
             onSearch={search}
           />
-          <Table dataSource={dataSource} columns={colums} loading={loading} pagination={{
-            onChange: onChangePage,
-          }} />
-
+          <Table
+            dataSource={dataSource}
+            columns={colums}
+            loading={loading}
+            pagination={{
+              onChange: onChangePage,
+            }}
+          />
         </div>
-
       </div>
-
     </div>
   );
 };

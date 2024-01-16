@@ -6,6 +6,7 @@ import sha256 from 'crypto-js/sha256';
 export const userLogin = createAsyncThunk(
 	'auth/login',
 	async ({ userName, password }: any, { rejectWithValue }) => {
+		let infoResponse = null;
 		try {
 			const { data } = await axios.post(`${basePath}/sessions`, {
 				'account': userName,
@@ -13,8 +14,32 @@ export const userLogin = createAsyncThunk(
 			});
 			if(data?.token){
 				localStorage.setItem('admin-web-token', data.token);
+				infoResponse = await axios.get(`${basePath}/admins/self`, { headers: {Authorization: `Bearer ${data?.token}`}});
 			}
-			return data;
+			// get userInfo 
+			return {...data, info: infoResponse?.data};
+		} catch (error: any) {
+			// return custom error message from API if any
+			if (error.response && error.response.data.message) {
+				return rejectWithValue(error.response.data.message);
+			} else {
+				return rejectWithValue(error.message);
+			}
+		}
+	}
+);
+
+
+export const userInfoAuth = createAsyncThunk(
+	'auth/info',
+	async ({ token }: any, { rejectWithValue }) => {
+		let infoResponse = null;
+		try {
+			if(token){
+				infoResponse = await axios.get(`${basePath}/admins/self`, { headers: {Authorization: `Bearer ${token}`}});
+			}
+			// get userInfo 
+			return {info: infoResponse?.data};
 		} catch (error: any) {
 			// return custom error message from API if any
 			if (error.response && error.response.data.message) {

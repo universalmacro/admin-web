@@ -8,27 +8,15 @@ interface ModalFormProps {
   onCancel: () => void;
 }
 
-const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
+const UpdateModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
   const [inputValue, setInputValue] = useState(0);
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    console.log("ModalForm-useEffect", state);
-    form.setFieldsValue({
-      account: state?.account ?? "",
-      password: state?.password ?? "",
-      role: state?.role ?? "ADMIN",
-    });
-  }, [state?.account]);
-
-  const onChange = (newValue: number) => {
-    setInputValue(newValue);
-  };
+  console.log(state);
 
   return (
     <Modal
       open={visible}
-      title="新增管理員"
+      title="更新密碼"
       okText="確認"
       cancelText="取消"
       onCancel={onCancel}
@@ -37,7 +25,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
           .validateFields()
           .then((values) => {
             form.resetFields();
-            onSave({ ...state, ...values });
+            onSave({ ...values, id: state?.id });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -45,18 +33,6 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
       }}
     >
       <Form form={form} layout="vertical" name="form_in_modal">
-        <Form.Item
-          name="account"
-          label="賬號"
-          rules={[
-            {
-              required: true,
-              message: "請輸入賬號",
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
         <Form.Item
           name="password"
           label="密碼"
@@ -69,18 +45,9 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
         >
           <Input.Password />
         </Form.Item>
-
-        <Form.Item name="role" label="類型">
-          <Select
-            disabled
-            defaultValue="ADMIN"
-            style={{ width: 120 }}
-            options={[{ value: "ADMIN", label: "管理員" }]}
-          />
-        </Form.Item>
       </Form>
     </Modal>
   );
 };
 
-export default ModalForm;
+export default UpdateModalForm;

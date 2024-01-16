@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { userLogin } from "./authActions";
+import { userLogin, userInfoAuth } from "./authActions";
 
 // initialize userToken from local storage
 const userToken = localStorage.getItem('admin-web-token')
@@ -38,11 +38,27 @@ const authSlice = createSlice({
       })
       .addCase(userLogin.fulfilled, (state: any, { payload }: any) => {
         state.loading = false;
-        state.userInfo = payload;
+        state.userInfo = payload?.info;
         state.userToken = payload.token;
         return state;
       })
       .addCase(userLogin.rejected, (state: any, { payload }: any) => {
+        state.loading = false;
+        state.error = payload;
+        return state;
+      })
+      builder
+      .addCase(userInfoAuth.pending, (state: any, { payload }: any) => {
+        state.loading = true;
+        state.error = null;
+        return state;
+      })
+      .addCase(userInfoAuth.fulfilled, (state: any, { payload }: any) => {
+        state.loading = false;
+        state.userInfo = payload?.info;
+        return state;
+      })
+      .addCase(userInfoAuth.rejected, (state: any, { payload }: any) => {
         state.loading = false;
         state.error = payload;
         return state;

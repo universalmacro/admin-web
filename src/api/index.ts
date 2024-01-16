@@ -34,8 +34,33 @@ export const createAdmins = async (data: any, config: any) => {
   return res.data;
 };
 
+export const getAdminInfo = async (id: string, params: any) => {
+  const res = await axios.get(`${basePath}/admins/${id}`, params);
+  return res.data;
+};
+
+export const deleteAdmin = async (id: string, config: any) => {
+  const res = await axios.delete(`${basePath}/admins/${id}`, config);
+  return res.data;
+};
+
+export const updateAdminPassword = async (id: string, data: any, config: any) => {
+  const res = await axios.put(`${basePath}/admins/${id}/password`, data, config);
+  return res.data;
+};
+
+export const updateSelfPassword = async (data: any, config: any) => {
+  const res = await axios.put(`${basePath}/admins/self/password`, data, config);
+  return res.data;
+};
+
 export const getNodes = async (params: any) => {
   const res = await axios.get(`${basePath}/nodes`, params);
+  return res.data;
+};
+
+export const createNode = async (data: any, config: any) => {
+  const res = await axios.post(`${basePath}/nodes`, data, config);
   return res.data;
 };
 
