@@ -1,28 +1,13 @@
 import React, { useEffect, useState } from "react";
-import {
-  createAdmins,
-  basePath,
-  deleteAdmin,
-  getAdmins,
-  updateAdminPassword,
-  getAdminInfo,
-} from "api";
+import { basePath, getAdmins } from "api";
 import { Table, Button, Modal, Tag, Input } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RiAddFill } from "react-icons/ri";
 import { AppDispatch } from "../../../store";
-import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
 import UpdateModalForm from "./update-modal-form";
-
 import sha256 from "crypto-js/sha256";
-
-import {
-  AdminApi,
-  Configuration,
-  ConfigurationParameters,
-  NodeApi,
-} from "@universalmacro/core-ts-sdk";
+import { AdminApi, Configuration, ConfigurationParameters } from "@universalmacro/core-ts-sdk";
 
 const paginationConfig = {
   pageSize: 10,
@@ -31,8 +16,8 @@ const paginationConfig = {
 
 const Tables = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [tagFilters, setTagFilters] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [adminApi, setAdminApi] = useState(null);
   const [updateVisible, setUpdateVisible] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -41,43 +26,56 @@ const Tables = () => {
 
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
-  const { restaurantList, restaurantId, restaurantInfo } =
-    useSelector((state: any) => state.restaurant) || {};
   const [dataSource, setDataSource] = useState([]);
-  const navigate = useNavigate();
 
   const { confirm } = Modal;
+
+  const successCallback = () => {
+    Modal.success({
+      content: "操作成功！",
+    });
+  };
+
+  const errorCallback = (e: any) => {
+    Modal.error({
+      content: `${e}`,
+    });
+  };
 
   const onChangePage = (page: number, pageSize: number) => {
     getAdminList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
   };
 
-  const updatePassword = async (values: any) => {
-    const adminApi = new AdminApi(
-      new Configuration({
-        basePath: basePath,
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      } as ConfigurationParameters)
-    );
-
-    let updateAdminPasswordRequest = {
-      id: values?.id,
-      // password: values?.password,
-      password: sha256(sha256(values?.password).toString()).toString(),
-    };
-
-    try {
-      // const res = await adminApi.updateAdminPassword(UpdateAdminPasswordRequest);
-      const res = await updateAdminPassword(
-        values?.id,
-        { ...updateAdminPasswordRequest },
-        {
-          headers: getHeaders(),
-        }
+  useEffect(() => {
+    if (!adminApi) {
+      setAdminApi(
+        new AdminApi(
+          new Configuration({
+            basePath: basePath,
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+            },
+          } as ConfigurationParameters)
+        )
       );
-    } catch (e) {}
+    }
+
+    getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
+  }, [adminApi, userInfo?.id, userToken]);
+
+  const updatePassword = async (values: any) => {
+    try {
+      const res = await adminApi?.updateAdminPassword({
+        id: values?.id,
+        updatePasswordRequest: {
+          password: sha256(sha256(values?.password).toString()).toString(),
+        },
+      });
+      setUpdateVisible(false);
+      successCallback();
+    } catch (e) {
+      errorCallback(e);
+    }
   };
 
   const getAdminList = async (page: number, pageSize: number) => {
@@ -91,6 +89,8 @@ const Tables = () => {
         headers: getHeaders(),
         params: { ...pagination },
       });
+      // 使用API請求的更新時間為 Invalid Date
+      // const res = await adminApi.listAdmin({ ...pagination });
       setDataSource(res?.items);
       setLoading(false);
     } catch (e) {
@@ -98,19 +98,6 @@ const Tables = () => {
       setLoading(false);
     }
   };
-
-  const getInfo = async () => {
-    const res = await getAdminInfo("1746764246491856896", {
-      headers: getHeaders(),
-    });
-  };
-  useEffect(() => {
-    getInfo();
-  }, []);
-
-  useEffect(() => {
-    getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
-  }, [userToken]);
 
   const getHeaders = () => {
     return {
@@ -120,26 +107,18 @@ const Tables = () => {
   };
 
   const onSave = async (values: any) => {
-    console.log("onSave===================", values);
-    const adminApi = new AdminApi(
-      new Configuration({
-        basePath: basePath,
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      } as ConfigurationParameters)
-    );
-
     try {
-      const res = await createAdmins(
-        { ...values, password: sha256(sha256(values?.password).toString()).toString() },
-        {
-          headers: getHeaders(),
-        }
-      );
+      const res = await adminApi?.createAdmin({
+        createAdminRequest: {
+          account: values?.account,
+          password: sha256(sha256(values?.password).toString()).toString(),
+          role: values?.role,
+        },
+      });
       getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
-      // const res = await adminApi.createAdmin({ ...values });
-    } catch (e) {}
+    } catch (e) {
+      errorCallback(e);
+    }
     setVisible(false);
   };
 
@@ -150,10 +129,7 @@ const Tables = () => {
   const handleDelete = (record: any) => {
     showDeleteConfirm(async () => {
       try {
-        const res = await deleteAdmin(record.id, {
-          headers: getHeaders(),
-        });
-        console.log("handleDelete", res);
+        const res = await adminApi?.deleteAdmin({ id: record.id });
         getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
       } catch (e) {}
     });
@@ -162,8 +138,6 @@ const Tables = () => {
   const showDeleteConfirm = (onOk: any) => {
     confirm({
       title: "確認刪除？",
-      // icon: <ExclamationCircleFilled />,
-      // content: '確認刪除？',
       okText: "確認",
       okType: "danger",
       cancelText: "取消",
@@ -179,11 +153,9 @@ const Tables = () => {
       getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
       return;
     }
-
     const filterTable = dataSource.filter((o: any) =>
       Object.keys(o).some((k) => String(o[k]).toLowerCase().includes(value.toLowerCase()))
     );
-
     setDataSource(filterTable);
   };
 

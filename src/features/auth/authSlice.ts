@@ -6,7 +6,6 @@ const userToken = localStorage.getItem('admin-web-token')
   ? localStorage.getItem('admin-web-token')
   : null;
 
-
 const initialState = {
   loading: false,
   userInfo: {}, // for user object

@@ -2,14 +2,14 @@ import React, { useEffect } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import navbarimage from "assets/img/layout/Navbar.png";
 import { BsArrowBarUp } from "react-icons/bs";
-import { FiSearch } from "react-icons/fi";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RiMoonFill, RiSunFill } from "react-icons/ri";
-import { IoMdNotificationsOutline, IoMdInformationCircleOutline } from "react-icons/io";
-import avatar from "assets/img/avatars/avatar4.png";
+import { IoMdNotificationsOutline } from "react-icons/io";
+// import avatar from "assets/img/avatars/avatar4.png";
+import avatar from "assets/img/avatars/logo.jpg";
+
 import { logout } from "../../features/auth/authSlice";
 import { AppDispatch } from "../../store";
 import SelectRestaurant from "../select-restaurant";
@@ -159,7 +159,10 @@ const Navbar = (props: {
               <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20 " />
 
               <div className="ml-4 mt-3 flex flex-col">
-                <a href=" " className="text-sm text-gray-800 dark:text-white hover:dark:text-white">
+                <a
+                  href="/admin/profile"
+                  className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
+                >
                   Profile Settings
                 </a>
                 <a
