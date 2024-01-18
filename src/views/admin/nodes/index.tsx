@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
-import { Table, Button, Modal, Tooltip, Input } from "antd";
+import { Table, Button, Modal, Tooltip, Input, Dropdown, MenuProps } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RiAddFill } from "react-icons/ri";
 import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
+import { DownOutlined } from "@ant-design/icons";
+import { setNode } from "features/node/nodeSlice";
 
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 
@@ -14,7 +16,14 @@ const paginationConfig = {
   page: 0,
 };
 
+const items: MenuProps["items"] = [
+  { key: "database", label: "database" },
+  { key: "server", label: "server" },
+  { key: "redis", label: "redis" },
+];
+
 const Tables = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [nodeApi, setNodeApi] = useState(null);
   const [visible, setVisible] = useState(false);
@@ -45,11 +54,6 @@ const Tables = () => {
     }
   };
 
-  const getInfo = async (record: any) => {
-    console.log("getinfo", record);
-    const res = await nodeApi?.getNodeDatabaseConfig({ id: record?.id });
-  };
-
   useEffect(() => {
     if (!nodeApi) {
       setNodeApi(
@@ -78,6 +82,12 @@ const Tables = () => {
       getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {}
     setVisible(false);
+  };
+
+  const toConfig = (key: any, record: any) => {
+    console.log("toConfig", key, record);
+    // navigate(`/config/${key}`, { state: { info: record } });
+    navigate(`/config/${key}`);
   };
 
   const successCallback = () => {
@@ -200,14 +210,14 @@ const Tables = () => {
       title: "提交時間",
       dataIndex: "createdAt",
       key: "createdAt",
-      width: "20%",
+      width: "15%",
       render: (text: any, record: any) => <>{new Date(text * 1000).toLocaleString()}</>,
     },
     {
       title: "更新時間",
       dataIndex: "updatedAt",
       key: "updatedAt",
-      width: "20%",
+      width: "15%",
       render: (text: any, record: any) => <>{new Date(text * 1000).toLocaleString()}</>,
     },
 
@@ -217,14 +227,27 @@ const Tables = () => {
       hidden: userInfo?.role !== "ROOT",
       render: (text: any, record: any) => (
         <>
-          <a
+          <Dropdown
+            menu={{
+              items,
+              onClick: ({ key }) => {
+                dispatch(setNode(record));
+                toConfig(key, record);
+              },
+            }}
+          >
+            <a className="mr-4 text-blue-400">
+              配置 <DownOutlined />
+            </a>
+          </Dropdown>
+          {/* <a
             className="mr-4 text-blue-400"
             onClick={() => {
               getInfo(record);
             }}
           >
             詳情
-          </a>
+          </a> */}
           <a className="text-red-400" onClick={() => handleDelete(record)}>
             刪除
           </a>
