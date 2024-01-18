@@ -9,6 +9,9 @@ import Profile from "views/admin/profile";
 // Auth Imports
 import SignIn from "views/auth/SignIn";
 
+// Configs Imports
+import Database from "views/config/database";
+
 // Icon Imports
 import { MdBarChart, MdLock, MdPeopleAlt } from "react-icons/md";
 import { FaShareNodes } from "react-icons/fa6";
@@ -44,6 +47,14 @@ const routes = [
     component: <Profile />,
   },
   {
+    name: "配置",
+    layout: "/admin",
+    icon: <FaShareNodes className="h-6 w-6" />,
+    path: "configs",
+    component: <NodeTables />,
+    hidden: true,
+  },
+  {
     name: "Sign In",
     layout: "/auth",
     path: "sign-in",
@@ -52,4 +63,37 @@ const routes = [
     component: <SignIn />,
   },
 ];
+
+const configRoutes = [
+  {
+    name: "返回",
+    layout: "/admin",
+    icon: <FaShareNodes className="h-6 w-6" />,
+    path: "nodes",
+    component: <NodeTables />,
+  },
+  {
+    name: "database",
+    layout: "/config",
+    icon: <MdBarChart className="h-6 w-6" />,
+    path: "database",
+    component: <Database />,
+  },
+  {
+    name: "server",
+    layout: "/config",
+    icon: <MdPeopleAlt className="h-6 w-6" />,
+    path: "server",
+    component: <AdminTables />,
+  },
+  {
+    name: "redis",
+    layout: "/config",
+    icon: <FaShareNodes className="h-6 w-6" />,
+    path: "redis",
+    component: <NodeTables />,
+  },
+];
 export default routes;
+
+export { configRoutes };
