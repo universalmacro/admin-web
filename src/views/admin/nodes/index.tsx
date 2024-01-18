@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
-import { Table, Button, Modal, Tag, Input } from "antd";
+import { Table, Button, Modal, Tooltip, Input } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RiAddFill } from "react-icons/ri";
 import { AppDispatch } from "../../../store";
@@ -22,10 +22,7 @@ const Tables = () => {
   const [formValues, setFormValues] = useState({});
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
-  const { restaurantList, restaurantId, restaurantInfo } =
-    useSelector((state: any) => state.restaurant) || {};
   const [dataSource, setDataSource] = useState([]);
-  const navigate = useNavigate();
 
   const { confirm } = Modal;
 
@@ -41,11 +38,16 @@ const Tables = () => {
         limit: pageSize ?? paginationConfig?.pageSize,
       };
       const res = await nodeApi?.listNode({ ...pagination });
-      setDataSource(res?.items);
+      setDataSource(res?.items ?? []);
       setLoading(false);
     } catch (e) {
       setLoading(false);
     }
+  };
+
+  const getInfo = async (record: any) => {
+    console.log("getinfo", record);
+    const res = await nodeApi?.getNodeDatabaseConfig({ id: record?.id });
   };
 
   useEffect(() => {
@@ -84,15 +86,23 @@ const Tables = () => {
     });
   };
 
+  const errorCallback = (e: any) => {
+    Modal.error({
+      content: `${e}`,
+    });
+  };
+
   const handleDelete = (record: any) => {
     showDeleteConfirm(async () => {
-      // try {
-      //   const res = await deleteItems(record.id, {
-      //     headers: getHeaders()
-      //   });
-      //   console.log("handleDelete", res);
-      // } catch (e) {
-      // }
+      try {
+        // const res = await deleteItems(record.id, {
+        //   headers: getHeaders()
+        // });
+        const res = await nodeApi?.deleteNode({ id: record?.id });
+        getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
+      } catch (e) {
+        errorCallback(e);
+      }
     });
   };
 
@@ -146,11 +156,43 @@ const Tables = () => {
       dataIndex: "description",
       key: "description",
       width: "20%",
+      onCell: () => {
+        return {
+          style: {
+            maxWidth: 10,
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            cursor: "pointer",
+          },
+        };
+      },
       render: (text: any, record: any) => {
         if (!text) {
           return <>無</>;
         } else {
-          return <>{text}</>;
+          return (
+            <Tooltip title={text} overlayInnerStyle={{ maxWidth: "40px" }}>
+              <span className="cursor-pointer">{text}</span>
+            </Tooltip>
+          );
+        }
+      },
+    },
+    {
+      title: "安全碼",
+      dataIndex: "securityKey",
+      key: "securityKey",
+      width: "10%",
+      render: (text: any, record: any) => {
+        if (!text) {
+          return <>無</>;
+        } else {
+          return (
+            <Tooltip title={text} overlayInnerStyle={{ width: "520px" }} trigger="click">
+              <span className="cursor-pointer text-cyan-400">查看</span>
+            </Tooltip>
+          );
         }
       },
     },
@@ -172,15 +214,24 @@ const Tables = () => {
     {
       title: "操作",
       key: "operation",
+      hidden: userInfo?.role !== "ROOT",
       render: (text: any, record: any) => (
         <>
+          <a
+            className="mr-4 text-blue-400"
+            onClick={() => {
+              getInfo(record);
+            }}
+          >
+            詳情
+          </a>
           <a className="text-red-400" onClick={() => handleDelete(record)}>
             刪除
           </a>
         </>
       ),
     },
-  ];
+  ].filter((item) => !item.hidden);
 
   return (
     <div>

@@ -14,9 +14,9 @@ export const userLogin = createAsyncThunk(
 			});
 			if(data?.token){
 				localStorage.setItem('admin-web-token', data.token);
+			  // get userInfo 
 				infoResponse = await axios.get(`${basePath}/admins/self`, { headers: {Authorization: `Bearer ${data?.token}`}});
 			}
-			// get userInfo 
 			return {...data, info: infoResponse?.data};
 		} catch (error: any) {
 			// return custom error message from API if any

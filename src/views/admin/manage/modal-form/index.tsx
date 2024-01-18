@@ -9,21 +9,15 @@ interface ModalFormProps {
 }
 
 const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
-  const [inputValue, setInputValue] = useState(0);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    console.log("ModalForm-useEffect", state);
     form.setFieldsValue({
       account: state?.account ?? "",
       password: state?.password ?? "",
       role: state?.role ?? "ADMIN",
     });
   }, [state?.account]);
-
-  const onChange = (newValue: number) => {
-    setInputValue(newValue);
-  };
 
   return (
     <Modal

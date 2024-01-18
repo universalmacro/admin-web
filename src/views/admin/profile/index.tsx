@@ -78,6 +78,9 @@ const Tables = () => {
 
   return (
     <div>
+      <div className="mt-5 grid h-full grid-cols-1 gap-5">
+        <p className="mb-4 text-xl">信息</p>
+      </div>
       <div className="mt-5 flex grid h-full grid-cols-1 items-center justify-center gap-5 rounded-lg bg-white p-8">
         <Form
           form={form}

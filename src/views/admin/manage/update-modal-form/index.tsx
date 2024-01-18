@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { Modal, Form, Input, Select } from "antd";
+import { Modal, Form, Input } from "antd";
 
 interface ModalFormProps {
   state: any;
@@ -9,9 +8,7 @@ interface ModalFormProps {
 }
 
 const UpdateModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
-  const [inputValue, setInputValue] = useState(0);
   const [form] = Form.useForm();
-  console.log(state);
 
   return (
     <Modal
