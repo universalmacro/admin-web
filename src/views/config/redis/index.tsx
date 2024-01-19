@@ -1,45 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { basePath, getAdmins } from "api";
-import { Table, Button, Modal, Checkbox, Input, Form, Select } from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { RiAddFill } from "react-icons/ri";
-import { AppDispatch } from "../../../store";
-import ModalForm from "./modal-form";
-import sha256 from "crypto-js/sha256";
-import { useLocation } from "react-router-dom";
-import {
-  AdminApi,
-  Configuration,
-  ConfigurationParameters,
-  NodeApi,
-} from "@universalmacro/core-ts-sdk";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { basePath } from "api";
+import { Button, Modal, Checkbox, Input, Form } from "antd";
+import { useSelector } from "react-redux";
+import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 
-const paginationConfig = {
-  pageSize: 10,
-  page: 0,
-};
-
-const DatabaseConfig = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [visible, setVisible] = useState(false);
-  const [updateVisible, setUpdateVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+const RedisConfig = () => {
   const [nodeApi, setNodeApi] = useState(null);
+  const [componentDisabled, setComponentDisabled] = useState<boolean>(true);
   const [form] = Form.useForm();
-  const { nodeInfo, nodeConfig } = useSelector((state: any) => state.node) || {};
 
+  const { nodeInfo, nodeConfig } = useSelector((state: any) => state.node) || {};
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
-
-  const [componentDisabled, setComponentDisabled] = useState<boolean>(true);
-
-  // const getInfo = async (id: string) => {
-  //   const res = await nodeApi?.getNodeConfig({ id: id });
-  //   if (res) {
-  //     setDatabaseConfig(res?.database);
-  //   }
-  // };
 
   useEffect(() => {
     if (!nodeApi) {
@@ -57,12 +29,10 @@ const DatabaseConfig = () => {
   }, [nodeApi, userInfo?.id, userToken]);
 
   useEffect(() => {
-    // if (nodeConfig?.database) {
     form.setFieldsValue({
-      ...nodeConfig?.database,
+      ...nodeConfig?.redis,
     });
-    // }
-  }, [nodeConfig?.database]);
+  }, [nodeConfig?.redis]);
 
   const successCallback = () => {
     Modal.success({
@@ -80,7 +50,7 @@ const DatabaseConfig = () => {
     try {
       let params = {
         id: nodeInfo?.id,
-        nodeConfig: { database: { ...values } },
+        nodeConfig: { redis: { ...values } },
       };
       console.log(params);
       try {
@@ -104,7 +74,7 @@ const DatabaseConfig = () => {
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <div>
           <div className="flex justify-between">
-            <p className="mb-4 inline text-xl">Database 配置</p>{" "}
+            <p className="mb-4 inline text-xl">Redis 配置</p>{" "}
           </div>
 
           <div className="mt-5 flex grid h-full grid-cols-1 items-center justify-center gap-5 rounded-lg bg-white p-8">
@@ -139,32 +109,11 @@ const DatabaseConfig = () => {
                 <Input />
               </Form.Item>
               <Form.Item
-                label="username"
-                name="username"
-                rules={[{ required: true, message: "請輸入username" }]}
-              >
-                <Input />
-              </Form.Item>
-              <Form.Item
                 label="password"
                 name="password"
                 rules={[{ required: true, message: "請輸入password" }]}
               >
                 <Input.Password />
-              </Form.Item>
-
-              <Form.Item
-                name="database"
-                label="database"
-                rules={[{ required: true, message: "請選擇" }]}
-              >
-                <Select
-                  style={{ width: 120 }}
-                  options={[
-                    { value: "MYSQL", label: "MYSQL" },
-                    { value: "POSTGRES", label: "POSTGRES" },
-                  ]}
-                />
               </Form.Item>
 
               {!componentDisabled && (
@@ -182,4 +131,4 @@ const DatabaseConfig = () => {
   );
 };
 
-export default DatabaseConfig;
+export default RedisConfig;
