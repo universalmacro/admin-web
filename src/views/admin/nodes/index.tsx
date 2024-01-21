@@ -20,6 +20,7 @@ const items: MenuProps["items"] = [
   { key: "database", label: "database" },
   { key: "server", label: "server" },
   { key: "redis", label: "redis" },
+  { key: "api", label: "api" },
 ];
 
 const Tables = () => {

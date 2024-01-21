@@ -10,11 +10,16 @@ import Profile from "views/admin/profile";
 import SignIn from "views/auth/SignIn";
 
 // Configs Imports
-import Database from "views/config/database";
+import DatabaseConfig from "views/config/database";
+import ServerConfig from "views/config/server";
+import RedisConfig from "views/config/redis";
+import ApiConfig from "views/config/api";
 
 // Icon Imports
 import { MdBarChart, MdLock, MdPeopleAlt } from "react-icons/md";
-import { FaShareNodes } from "react-icons/fa6";
+import { FaShareNodes, FaDatabase, FaServer } from "react-icons/fa6";
+import { TbApi } from "react-icons/tb";
+import { SiRedis } from "react-icons/si";
 import { CgProfile } from "react-icons/cg";
 
 const routes = [
@@ -64,6 +69,7 @@ const routes = [
   },
 ];
 
+// 節點配置的路由
 const configRoutes = [
   {
     name: "返回",
@@ -75,23 +81,30 @@ const configRoutes = [
   {
     name: "database",
     layout: "/config",
-    icon: <MdBarChart className="h-6 w-6" />,
+    icon: <FaDatabase className="h-6 w-6" />,
     path: "database",
-    component: <Database />,
+    component: <DatabaseConfig />,
   },
   {
     name: "server",
     layout: "/config",
-    icon: <MdPeopleAlt className="h-6 w-6" />,
+    icon: <FaServer className="h-6 w-6" />,
     path: "server",
-    component: <AdminTables />,
+    component: <ServerConfig />,
   },
   {
     name: "redis",
     layout: "/config",
-    icon: <FaShareNodes className="h-6 w-6" />,
+    icon: <SiRedis className="h-6 w-6" />,
     path: "redis",
-    component: <NodeTables />,
+    component: <RedisConfig />,
+  },
+  {
+    name: "api",
+    layout: "/config",
+    icon: <TbApi className="h-6 w-6" />,
+    path: "api",
+    component: <ApiConfig />,
   },
 ];
 export default routes;
