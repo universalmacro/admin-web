@@ -10,6 +10,7 @@ import { DownOutlined } from "@ant-design/icons";
 import { setNode } from "features/node/nodeSlice";
 
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
+import CommonTable from "components/common-table";
 
 const paginationConfig = {
   pageSize: 10,
@@ -270,25 +271,14 @@ const Tables = () => {
 
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <div>
-          <div className="flex justify-between">
-            <p className="mb-4 inline text-xl">節點列表</p>{" "}
-            <Button onClick={addPerson} icon={<RiAddFill />}>
-              新增
-            </Button>
-          </div>
-          <Input.Search
-            style={{ margin: "0 0 10px 0" }}
-            placeholder="請輸入 ID / 角色 / 賬號 等搜索..."
-            enterButton
+          <CommonTable
+            title="節點列表"
+            onAddItem={addPerson}
             onSearch={search}
-          />
-          <Table
             dataSource={dataSource}
             columns={colums}
             loading={loading}
-            pagination={{
-              onChange: onChangePage,
-            }}
+            onChangePage={onChangePage}
           />
         </div>
       </div>

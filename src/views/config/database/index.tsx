@@ -4,9 +4,6 @@ import { Table, Button, Modal, Checkbox, Input, Form, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { RiAddFill } from "react-icons/ri";
 import { AppDispatch } from "../../../store";
-import ModalForm from "./modal-form";
-import sha256 from "crypto-js/sha256";
-import { useLocation } from "react-router-dom";
 import {
   AdminApi,
   Configuration,
@@ -152,12 +149,14 @@ const DatabaseConfig = () => {
               >
                 <Input.Password />
               </Form.Item>
-
               <Form.Item
-                name="database"
                 label="database"
-                rules={[{ required: true, message: "請選擇" }]}
+                name="database"
+                rules={[{ required: true, message: "請輸入database" }]}
               >
+                <Input />
+              </Form.Item>
+              <Form.Item name="type" label="type" rules={[{ required: true, message: "請選擇" }]}>
                 <Select
                   style={{ width: 120 }}
                   options={[
