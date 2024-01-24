@@ -7,6 +7,8 @@ import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import ItemInfo from "views/info/ItemInfo";
 import ConfigLayout from "layouts/config";
+import MerchantLayout from "layouts/merchant";
+
 const App = () => {
   return (
     <Routes>
@@ -29,7 +31,29 @@ const App = () => {
       />
       <Route path="info/*" element={<ItemInfo />} />
       <Route path="rtl/*" element={<RtlLayout />} />
-      <Route path="config/*" element={<ConfigLayout />} />
+      <Route
+        path="nodes/:id/config/*"
+        element={
+          <PrivateRoute>
+            <ConfigLayout />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="nodes/:id/*"
+        element={
+          <PrivateRoute>
+            <MerchantLayout />
+          </PrivateRoute>
+        }
+      />
+
+      {/* <Route path="nodes/:id/config/*" element={<ConfigLayout />} /> */}
+      {/* <Route path="nodes/*" element={<ConfigLayout />} /> */}
+
+      {/* <Route path="nodes/:id/*" element={<MerchantLayout />} /> */}
+
       <Route path="/" element={<Navigate to="admin/" replace />} />
     </Routes>
   );

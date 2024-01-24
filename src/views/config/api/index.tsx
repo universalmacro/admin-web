@@ -1,19 +1,11 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
-import { Button, Modal, Checkbox, Input, Form, Select } from "antd";
+import { Button, Modal, Checkbox, Input, Form } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../store";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 
 const ApiConfig = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [visible, setVisible] = useState(false);
-  const [updateVisible, setUpdateVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [formValues, setFormValues] = useState({});
   const [nodeApi, setNodeApi] = useState(null);
-  const [apiConfig, setApiConfig] = useState(null);
-
   const [form] = Form.useForm();
   const [componentDisabled, setComponentDisabled] = useState<boolean>(true);
   const { confirm } = Modal;

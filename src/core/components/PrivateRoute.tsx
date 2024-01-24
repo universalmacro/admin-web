@@ -18,6 +18,7 @@ const PrivateRoute = ({ children }: any) => {
     Modal.error({
       content: `獲取個人信息錯誤：${e}`,
       afterClose: () => {
+        localStorage.removeItem("admin-web-token");
         navigate("/auth/sign-in");
       },
     });
@@ -35,7 +36,7 @@ const PrivateRoute = ({ children }: any) => {
     }
   }, [error]);
 
-  if (userToken) {
+  if (userToken && !error) {
     return children;
   } else {
     return <Navigate to="/auth/sign-in" />;

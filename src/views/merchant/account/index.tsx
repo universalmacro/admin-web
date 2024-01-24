@@ -8,8 +8,20 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
 import { DownOutlined } from "@ant-design/icons";
 import { setNode } from "features/node/nodeSlice";
+import { useParams } from "react-router-dom";
+// import {
+//   Configuration as MerchantConfig,
+//   ConfigurationParameters as MerchantConfigParam,
+//   MerchantApi,
+// } from "@universalmacro/merchant-ts-sdk";
+import sha256 from "crypto-js/sha256";
 
-import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
+import {
+  Configuration,
+  ConfigurationParameters,
+  NodeApi,
+  MerchantApi,
+} from "@universalmacro/core-ts-sdk";
 import CommonTable from "components/common-table";
 // import { CommonTable } from "@macro-components/common";
 
@@ -18,17 +30,10 @@ const paginationConfig = {
   page: 0,
 };
 
-const items: MenuProps["items"] = [
-  { key: "database", label: "database" },
-  { key: "server", label: "server" },
-  { key: "redis", label: "redis" },
-  { key: "api", label: "api" },
-];
-
 const Tables = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [nodeApi, setNodeApi] = useState(null);
+  const [merchantApi, setMerchantApi] = useState(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({});
@@ -36,31 +41,14 @@ const Tables = () => {
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
   const [dataSource, setDataSource] = useState([]);
 
+  const { id } = useParams();
+
   const { confirm } = Modal;
 
-  const onChangePage = (page: number, pageSize: number) => {
-    getNodeList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
-  };
-
-  const getNodeList = async (page: number, pageSize: number) => {
-    setLoading(true);
-    try {
-      let pagination = {
-        index: page ?? paginationConfig?.page,
-        limit: pageSize ?? paginationConfig?.pageSize,
-      };
-      const res = await nodeApi?.listNode({ ...pagination });
-      setDataSource(res?.items ?? []);
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (!nodeApi) {
-      setNodeApi(
-        new NodeApi(
+    if (!merchantApi) {
+      setMerchantApi(
+        new MerchantApi(
           new Configuration({
             basePath: basePath,
             headers: {
@@ -70,27 +58,43 @@ const Tables = () => {
         )
       );
     }
-    getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
-  }, [nodeApi, userInfo?.id, userToken]);
+
+    // getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
+  }, [merchantApi, userInfo?.id, userToken]);
+
+  const onChangePage = (page: number, pageSize: number) => {
+    // getNodeList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
+  };
+
+  // const getNodeList = async (page: number, pageSize: number) => {
+  //   setLoading(true);
+  //   try {
+  //     let pagination = {
+  //       index: page ?? paginationConfig?.page,
+  //       limit: pageSize ?? paginationConfig?.pageSize,
+  //     };
+  //     const res = await nodeApi?.listNode({ ...pagination });
+  //     setDataSource(res?.items ?? []);
+  //     setLoading(false);
+  //   } catch (e) {
+  //     setLoading(false);
+  //   }
+  // };
 
   const onSave = async (values: any) => {
     try {
-      const res = await nodeApi.createNode({
-        createNodeRequest: {
-          name: values?.name,
-          description: values?.description,
+      const res = await merchantApi?.addMerchantToNode({
+        id: id,
+        createMerchantRequest: {
+          account: values?.account,
+          password: sha256(sha256(values?.password).toString()).toString(),
         },
       });
-      successCallback();
-      getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
-    } catch (e) {}
+      // getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
+    } catch (e) {
+      errorCallback(e);
+    }
     setVisible(false);
-  };
-
-  const toConfig = (key: any, record: any) => {
-    console.log("toConfig", key, record);
-    // navigate(`/config/${key}`, { state: { info: record } });
-    navigate(`/nodes/${record?.id}/config/${key}`);
   };
 
   const successCallback = () => {
@@ -111,8 +115,8 @@ const Tables = () => {
         // const res = await deleteItems(record.id, {
         //   headers: getHeaders()
         // });
-        const res = await nodeApi?.deleteNode({ id: record?.id });
-        getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
+        // const res = await nodeApi?.deleteNode({ id: record?.id });
+        // getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
       } catch (e) {
         errorCallback(e);
       }
@@ -136,7 +140,7 @@ const Tables = () => {
 
   const search = (value: string) => {
     if (value === "") {
-      getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
+      // getNodeList(paginationConfig?.page, paginationConfig?.pageSize);
       return;
     }
 
@@ -196,26 +200,15 @@ const Tables = () => {
       title: "安全碼",
       dataIndex: "securityKey",
       key: "securityKey",
-      width: "10%",
+      width: "5%",
       render: (text: any, record: any) => {
         if (!text) {
           return <>無</>;
         } else {
           return (
-            <>
-              <Tooltip title={text} overlayInnerStyle={{ width: "520px" }} trigger="click">
-                <span className="mr-4 cursor-pointer text-cyan-400">查看</span>
-              </Tooltip>
-
-              <span
-                className="cursor-pointer text-cyan-400"
-                onClick={() => {
-                  navigator.clipboard.writeText(text);
-                }}
-              >
-                複製
-              </span>
-            </>
+            <Tooltip title={text} overlayInnerStyle={{ width: "520px" }} trigger="click">
+              <span className="cursor-pointer text-cyan-400">查看</span>
+            </Tooltip>
           );
         }
       },
@@ -241,35 +234,6 @@ const Tables = () => {
       hidden: userInfo?.role !== "ROOT",
       render: (text: any, record: any) => (
         <>
-          <Dropdown
-            menu={{
-              items,
-              onClick: ({ key }) => {
-                dispatch(setNode(record));
-                toConfig(key, record);
-              },
-            }}
-          >
-            <a className="mr-4 text-blue-400">
-              配置 <DownOutlined />
-            </a>
-          </Dropdown>
-          {/* <a
-            className="mr-4 text-blue-400"
-            onClick={() => {
-              getInfo(record);
-            }}
-          >
-            詳情
-          </a> */}
-          <a
-            className="mr-4 text-blue-400"
-            onClick={() => {
-              navigate(`/nodes/${record?.id}/merchant`);
-            }}
-          >
-            帳號管理
-          </a>
           <a className="text-red-400" onClick={() => handleDelete(record)}>
             刪除
           </a>
@@ -292,7 +256,7 @@ const Tables = () => {
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <div>
           <CommonTable
-            title="節點列表"
+            title="帳號列表"
             onAddItem={addPerson}
             onSearch={search}
             dataSource={dataSource}
