@@ -15,6 +15,9 @@ import ServerConfig from "views/config/server";
 import RedisConfig from "views/config/redis";
 import ApiConfig from "views/config/api";
 
+// Merchants
+import MerchantConfig from "views/merchant/account";
+
 // Icon Imports
 import { MdBarChart, MdLock, MdPeopleAlt } from "react-icons/md";
 import { FaShareNodes, FaDatabase, FaServer } from "react-icons/fa6";
@@ -77,36 +80,62 @@ const configRoutes = [
     icon: <FaShareNodes className="h-6 w-6" />,
     path: "nodes",
     component: <NodeTables />,
+    secondary: false,
   },
   {
     name: "database",
-    layout: "/config",
+    layout: "/nodes",
     icon: <FaDatabase className="h-6 w-6" />,
     path: "database",
     component: <DatabaseConfig />,
+    secondary: true,
   },
   {
     name: "server",
-    layout: "/config",
+    layout: "/nodes",
     icon: <FaServer className="h-6 w-6" />,
     path: "server",
     component: <ServerConfig />,
+    secondary: true,
   },
   {
     name: "redis",
-    layout: "/config",
+    layout: "/nodes",
     icon: <SiRedis className="h-6 w-6" />,
     path: "redis",
     component: <RedisConfig />,
+    secondary: true,
   },
   {
     name: "api",
-    layout: "/config",
+    layout: "/nodes",
     icon: <TbApi className="h-6 w-6" />,
     path: "api",
     component: <ApiConfig />,
+    secondary: true,
   },
 ];
+
+// 節點配置的路由
+const merchantsRoutes = [
+  {
+    name: "返回",
+    layout: "/admin",
+    icon: <FaShareNodes className="h-6 w-6" />,
+    path: "nodes",
+    component: <NodeTables />,
+    secondary: false,
+  },
+  {
+    name: "merchant",
+    layout: "/merchant",
+    icon: <TbApi className="h-6 w-6" />,
+    path: "merchant",
+    component: <MerchantConfig />,
+    secondary: true,
+  },
+];
+
 export default routes;
 
-export { configRoutes };
+export { configRoutes, merchantsRoutes };

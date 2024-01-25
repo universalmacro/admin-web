@@ -2,7 +2,7 @@
 
 import { HiX } from "react-icons/hi";
 import Links from "./components/Links";
-import { configRoutes } from "routes";
+import { merchantsRoutes } from "routes";
 
 const Sidebar = (props: { open: boolean; onClose: React.MouseEventHandler<HTMLSpanElement> }) => {
   const { open, onClose } = props;
@@ -20,14 +20,14 @@ const Sidebar = (props: { open: boolean; onClose: React.MouseEventHandler<HTMLSp
 
       <div className={`ml-[50px] mr-[50px] mt-[50px] flex items-center`}>
         <div className="ml-1 mt-1 h-2.5 font-poppins text-[24px] font-bold uppercase text-navy-700 dark:text-white">
-          節點配置 <span className="font-medium"></span>
+          節點帳號 <span className="font-medium"></span>
         </div>
       </div>
       <div className="mb-7 mt-[58px] h-px bg-gray-300 dark:bg-white/30" />
       {/* Nav item */}
 
       <ul className="mb-auto pt-1">
-        <Links routes={configRoutes?.filter((item: any) => item?.hidden !== true)} id={id} />
+        <Links routes={merchantsRoutes?.filter((item: any) => item?.hidden !== true)} id={id} />
       </ul>
 
       {/* Nav item end */}

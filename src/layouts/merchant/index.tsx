@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
-import Sidebar from "components/config-sidebar";
+import Sidebar from "components/merchants-sidebar";
 import Footer from "components/footer/Footer";
 import { useDispatch, useSelector } from "react-redux";
-import { configRoutes } from "routes";
+import { merchantsRoutes } from "routes";
 import { AppDispatch } from "../../store";
 import { getNodeInfoConfig } from "../../features/node/nodeActions";
 import { setNode } from "features/node/nodeSlice";
@@ -28,7 +28,7 @@ export default function Config(props: { [x: string]: any }) {
     );
   }, []);
   React.useEffect(() => {
-    getActiveRoute(configRoutes);
+    getActiveRoute(merchantsRoutes);
   }, [location.pathname]);
 
   const getNodeInfo = async (id: string) => {
@@ -62,7 +62,7 @@ export default function Config(props: { [x: string]: any }) {
   }, [nodeInfo?.id]);
 
   const getActiveRoute = (routes: RoutesType[]): string | boolean => {
-    let activeRoute = "database";
+    let activeRoute = "merchant";
     for (let i = 0; i < routes.length; i++) {
       if (
         window.location.href.indexOf(routes[i].layout + "/" + nodeId + "/" + routes[i].path) !== -1
@@ -83,7 +83,7 @@ export default function Config(props: { [x: string]: any }) {
   };
   const getRoutes = (routes: RoutesType[]): any => {
     return routes.map((prop, key) => {
-      if (prop.layout === "/nodes") {
+      if (prop.layout === "/merchant") {
         return <Route path={`${prop.path}`} element={prop.component} key={key} />;
       } else {
         return null;
@@ -104,15 +104,11 @@ export default function Config(props: { [x: string]: any }) {
             <Navbar
               onOpenSidenav={() => setOpen(true)}
               brandText={currentRoute}
-              secondary={getActiveNavbar(configRoutes)}
+              secondary={getActiveNavbar(merchantsRoutes)}
               {...rest}
             />
             <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-              <Routes>
-                {getRoutes(configRoutes)}
-
-                <Route path="/" element={<Navigate to="/nodes/database" replace />} />
-              </Routes>
+              <Routes>{getRoutes(merchantsRoutes)}</Routes>
             </div>
             <div className="p-3">
               <Footer />

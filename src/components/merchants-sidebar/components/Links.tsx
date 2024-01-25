@@ -18,7 +18,7 @@ export const SidebarLinks = (props: { routes: RoutesType[]; id: string }): JSX.E
     return routes.map((route, index) => {
       if (
         route.layout === "/admin" ||
-        route.layout === "/auth" ||
+        route.layout === "/merchant" ||
         route.layout === "/rtl" ||
         route.layout === "/nodes"
       ) {
@@ -27,7 +27,7 @@ export const SidebarLinks = (props: { routes: RoutesType[]; id: string }): JSX.E
             key={index}
             to={
               route?.secondary
-                ? route.layout + "/" + id + "/config/" + route.path
+                ? route.layout + "/" + id + "/" + route.path
                 : route.layout + "/" + route.path
             }
           >
