@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
-import { Table, Button, Modal, Tooltip, Input, Dropdown, MenuProps } from "antd";
+import { Table, message, Modal, Tooltip, Input, Dropdown, MenuProps } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { RiAddFill } from "react-icons/ri";
 import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
 import { DownOutlined } from "@ant-design/icons";
-import { setNode } from "features/node/nodeSlice";
 
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 import CommonTable from "components/common-table";
-// import { CommonTable } from "@macro-components/common";
+// import { CommonTable } from "@macro-components/common-components";
 
 const paginationConfig = {
   pageSize: 10,
@@ -35,7 +33,7 @@ const Tables = () => {
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
   const [dataSource, setDataSource] = useState([]);
-
+  const [messageApi, contextHolder] = message.useMessage();
   const { confirm } = Modal;
 
   const onChangePage = (page: number, pageSize: number) => {
@@ -96,6 +94,13 @@ const Tables = () => {
   const successCallback = () => {
     Modal.success({
       content: "創建成功！",
+    });
+  };
+
+  const copySuccess = () => {
+    messageApi.open({
+      type: "success",
+      content: "複製成功",
     });
   };
 
@@ -168,7 +173,7 @@ const Tables = () => {
       title: "描述",
       dataIndex: "description",
       key: "description",
-      width: "20%",
+      width: "15%",
       onCell: () => {
         return {
           style: {
@@ -210,7 +215,8 @@ const Tables = () => {
               <span
                 className="cursor-pointer text-cyan-400"
                 onClick={() => {
-                  navigator.clipboard.writeText(text);
+                  // navigator.clipboard.writeText(text);
+                  copySuccess();
                 }}
               >
                 複製
@@ -238,6 +244,7 @@ const Tables = () => {
     {
       title: "操作",
       key: "operation",
+      width: "20%",
       hidden: userInfo?.role !== "ROOT",
       render: (text: any, record: any) => (
         <>
@@ -245,7 +252,7 @@ const Tables = () => {
             menu={{
               items,
               onClick: ({ key }) => {
-                dispatch(setNode(record));
+                // dispatch(setNode(record));
                 toConfig(key, record);
               },
             }}
@@ -288,7 +295,7 @@ const Tables = () => {
           setVisible(false);
         }}
       />
-
+      {contextHolder}
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <div>
           <CommonTable

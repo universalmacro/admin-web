@@ -1,11 +1,12 @@
 /* eslint-disable */
 import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import DashIcon from "components/icons/DashIcon";
 
 export const SidebarLinks = (props: { routes: RoutesType[]; id: string }): JSX.Element => {
   let location = useLocation();
-  const { routes, id } = props;
+  const { routes } = props;
+  const { id } = useParams();
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName: string) => {

@@ -1,17 +1,37 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
 import { Button, Modal, Checkbox, Input, Form } from "antd";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
+import { useParams, useNavigate } from "react-router-dom";
 
 const ServerConfig = () => {
   const [nodeApi, setNodeApi] = useState(null);
   const [componentDisabled, setComponentDisabled] = useState<boolean>(true);
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [serverConfig, setServerConfig] = useState(null);
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-  const { nodeInfo, nodeConfig } = useSelector((state: any) => state.node) || {};
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
+
+  const getConfigInfo = async (id: string) => {
+    setLoading(true);
+    try {
+      const res = await nodeApi?.getNodeConfig({ id: id });
+      if (res) {
+        setServerConfig(res?.server);
+      }
+      setLoading(false);
+    } catch (e) {
+      errorCallback(e, () => {
+        navigate("/admin/nodes");
+      });
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!nodeApi) {
@@ -26,13 +46,16 @@ const ServerConfig = () => {
         )
       );
     }
-  }, [nodeApi, userInfo?.id, userToken]);
+    getConfigInfo(id);
+  }, [nodeApi, userInfo?.id, userToken, id]);
 
   useEffect(() => {
-    form.setFieldsValue({
-      ...nodeConfig?.server,
-    });
-  }, [nodeConfig?.server]);
+    if (serverConfig) {
+      form.setFieldsValue({
+        ...serverConfig,
+      });
+    }
+  }, [serverConfig]);
 
   const successCallback = () => {
     Modal.success({
@@ -40,16 +63,17 @@ const ServerConfig = () => {
     });
   };
 
-  const errorCallback = (e: any) => {
+  const errorCallback = (e: any, afterClose: any = () => {}) => {
     Modal.error({
       content: `${e}`,
+      afterClose: afterClose,
     });
   };
 
   const onUpdate = async (values: any) => {
     try {
       let params = {
-        id: nodeInfo?.id,
+        id: id,
         nodeConfig: { server: { ...values } },
       };
       console.log(params);

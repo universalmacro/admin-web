@@ -1,18 +1,37 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
-import { Button, Modal, Checkbox, Input, Form } from "antd";
+import { Button, Modal, Checkbox, Input, Form, Spin } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
+import { useParams, useNavigate } from "react-router-dom";
 
 const ApiConfig = () => {
   const [nodeApi, setNodeApi] = useState(null);
   const [form] = Form.useForm();
   const [componentDisabled, setComponentDisabled] = useState<boolean>(true);
-  const { confirm } = Modal;
+  const [loading, setLoading] = useState(false);
+  const [apiConfig, setApiConfig] = useState(null);
+  const navigate = useNavigate();
+  const { id } = useParams();
 
-  const { nodeInfo, nodeConfig } = useSelector((state: any) => state.node) || {};
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
+
+  const getConfigInfo = async (id: string) => {
+    setLoading(true);
+    try {
+      const res = await nodeApi?.getNodeConfig({ id: id });
+      if (res) {
+        setApiConfig(res?.api);
+      }
+      setLoading(false);
+    } catch (e) {
+      errorCallback(e, () => {
+        navigate("/admin/nodes");
+      });
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!nodeApi) {
@@ -27,13 +46,16 @@ const ApiConfig = () => {
         )
       );
     }
-  }, [nodeApi, userInfo?.id, userToken]);
+    getConfigInfo(id);
+  }, [nodeApi, userInfo?.id, userToken, id]);
 
   useEffect(() => {
-    form.setFieldsValue({
-      ...nodeConfig?.api,
-    });
-  }, [nodeConfig?.api]);
+    if (apiConfig) {
+      form.setFieldsValue({
+        ...apiConfig,
+      });
+    }
+  }, [apiConfig]);
 
   const successCallback = () => {
     Modal.success({
@@ -41,29 +63,30 @@ const ApiConfig = () => {
     });
   };
 
-  const errorCallback = (e: any) => {
+  const errorCallback = (e: any, afterClose: any = () => {}) => {
     Modal.error({
       content: `${e}`,
+      afterClose: afterClose,
     });
   };
 
   const onUpdate = async (values: any) => {
+    setLoading(true);
     try {
       let params = {
-        id: nodeInfo?.id,
+        id: id,
         nodeConfig: { api: { ...values } },
       };
-      console.log(params);
-      try {
-        const res = await nodeApi?.updateNodeConfig({ ...params });
-        if (res) {
-          setComponentDisabled(true);
-          successCallback();
-        }
-      } catch (e) {
-        errorCallback(e);
+      const res = await nodeApi?.updateNodeConfig({ ...params });
+      if (res) {
+        setComponentDisabled(true);
+        successCallback();
       }
-    } catch (e) {}
+      setLoading(false);
+    } catch (e) {
+      errorCallback(e);
+      setLoading(false);
+    }
   };
 
   const onFinishFailed = (errorInfo: any) => {
@@ -72,47 +95,49 @@ const ApiConfig = () => {
 
   return (
     <div>
-      <div className="mt-5 grid h-full grid-cols-1 gap-5">
-        <div>
-          <div className="flex justify-between">
-            <p className="mb-4 inline text-xl">API 配置</p>{" "}
-          </div>
+      <Spin tip="Loading..." spinning={loading}>
+        <div className="mt-5 grid h-full grid-cols-1 gap-5">
+          <div>
+            <div className="flex justify-between">
+              <p className="mb-4 inline text-xl">API 配置</p>{" "}
+            </div>
 
-          <div className="mt-5 flex grid h-full grid-cols-1 items-center justify-center gap-5 rounded-lg bg-white p-8">
-            <Checkbox
-              checked={!componentDisabled}
-              onChange={(e: any) => setComponentDisabled(!e.target.checked)}
-            >
-              編輯
-            </Checkbox>
-            <Form
-              form={form}
-              disabled={componentDisabled}
-              onFinish={onUpdate}
-              onFinishFailed={onFinishFailed}
-              labelCol={{ span: 8 }}
-              wrapperCol={{ span: 16 }}
-              style={{ maxWidth: 600 }}
-              autoComplete="off"
-            >
-              <Form.Item
-                label="merchantUrl"
-                name="merchantUrl"
-                rules={[{ required: true, message: "請輸入merchantUrl" }]}
+            <div className="mt-5 flex grid h-full grid-cols-1 items-center justify-center gap-5 rounded-lg bg-white p-8">
+              <Checkbox
+                checked={!componentDisabled}
+                onChange={(e: any) => setComponentDisabled(!e.target.checked)}
               >
-                <Input />
-              </Form.Item>
-              {!componentDisabled && (
-                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                  <Button type="primary" htmlType="submit">
-                    保存
-                  </Button>
+                編輯
+              </Checkbox>
+              <Form
+                form={form}
+                disabled={componentDisabled}
+                onFinish={onUpdate}
+                onFinishFailed={onFinishFailed}
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 16 }}
+                style={{ maxWidth: 600 }}
+                autoComplete="off"
+              >
+                <Form.Item
+                  label="merchantUrl"
+                  name="merchantUrl"
+                  rules={[{ required: true, message: "請輸入merchantUrl" }]}
+                >
+                  <Input />
                 </Form.Item>
-              )}
-            </Form>
+                {!componentDisabled && (
+                  <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Button type="primary" htmlType="submit">
+                      保存
+                    </Button>
+                  </Form.Item>
+                )}
+              </Form>
+            </div>
           </div>
         </div>
-      </div>
+      </Spin>
     </div>
   );
 };
