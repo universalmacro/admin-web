@@ -6,8 +6,6 @@ import Footer from "components/footer/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { merchantsRoutes } from "routes";
 import { AppDispatch } from "../../store";
-import { getNodeInfoConfig } from "../../features/node/nodeActions";
-import { setNode } from "features/node/nodeSlice";
 import axios from "axios";
 import { basePath } from "../../api";
 
@@ -30,36 +28,6 @@ export default function Config(props: { [x: string]: any }) {
   React.useEffect(() => {
     getActiveRoute(merchantsRoutes);
   }, [location.pathname]);
-
-  const getNodeInfo = async (id: string) => {
-    try {
-      const res = await axios.get(`${basePath}/nodes/${id}`, {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
-      if (res) {
-        dispatch(setNode(res?.data));
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  useEffect(() => {
-    if (nodeId && !nodeInfo) {
-      getNodeInfo(nodeId);
-    }
-  }, [nodeId]);
-
-  React.useEffect(() => {
-    console.log("==========configlayout", nodeInfo);
-    if (nodeInfo?.id) {
-      // dispatch(setNode(location?.state?.info));
-      dispatch(getNodeInfoConfig({ id: nodeInfo.id, token: userToken }));
-    }
-  }, [nodeInfo?.id]);
 
   const getActiveRoute = (routes: RoutesType[]): string | boolean => {
     let activeRoute = "merchant";

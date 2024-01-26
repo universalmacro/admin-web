@@ -6,7 +6,6 @@ import Footer from "components/footer/Footer";
 import routes from "routes";
 import { AppDispatch } from "../../store";
 import { useDispatch, useSelector } from "react-redux";
-import { resetNode } from "../../features/node/nodeSlice";
 
 export default function Admin(props: { [x: string]: any }) {
   const { ...rest } = props;
@@ -19,7 +18,6 @@ export default function Admin(props: { [x: string]: any }) {
     window.addEventListener("resize", () =>
       window.innerWidth < 1200 ? setOpen(false) : setOpen(true)
     );
-    dispatch(resetNode({}));
   }, []);
 
   React.useEffect(() => {

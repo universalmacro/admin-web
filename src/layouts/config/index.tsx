@@ -6,10 +6,6 @@ import Footer from "components/footer/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { configRoutes } from "routes";
 import { AppDispatch } from "../../store";
-import { getNodeInfoConfig } from "../../features/node/nodeActions";
-import { setNode } from "features/node/nodeSlice";
-import axios from "axios";
-import { basePath } from "../../api";
 
 export default function Config(props: { [x: string]: any }) {
   const { ...rest } = props;
@@ -19,8 +15,6 @@ export default function Config(props: { [x: string]: any }) {
   const dispatch = useDispatch<AppDispatch>();
   const { userToken } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
-  const { nodeInfo } = useSelector((state: any) => state.node) || {};
-  // const nodeId = localStorage.getItem("admin-web-nodeId") || "";
   const { id: nodeId } = useParams();
 
   React.useEffect(() => {
@@ -31,37 +25,6 @@ export default function Config(props: { [x: string]: any }) {
   React.useEffect(() => {
     getActiveRoute(configRoutes);
   }, [location.pathname]);
-
-  // const getNodeInfo = async (id: string) => {
-  //   try {
-  //     const res = await axios.get(`${basePath}/nodes/${id}`, {
-  //       headers: {
-  //         "Content-Type": "application/json;charset=UTF-8",
-  //         Authorization: `Bearer ${userToken}`,
-  //       },
-  //     });
-  //     console.log("getNodeInfo", res);
-  //     if (res) {
-  //       dispatch(setNode(res?.data));
-  //     }
-  //   } catch (e) {
-  //     console.log(e);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (nodeId && !nodeInfo) {
-  //     getNodeInfo(nodeId);
-  //   }
-  // }, [nodeId]);
-
-  // React.useEffect(() => {
-  //   console.log("==========configlayout", nodeInfo);
-  //   if (nodeInfo?.id) {
-  //     // dispatch(setNode(location?.state?.info));
-  //     dispatch(getNodeInfoConfig({ id: nodeInfo.id, token: userToken }));
-  //   }
-  // }, [nodeInfo?.id]);
 
   const getActiveRoute = (routes: RoutesType[]): string | boolean => {
     let activeRoute = "database";

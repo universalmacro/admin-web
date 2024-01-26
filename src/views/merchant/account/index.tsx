@@ -56,7 +56,6 @@ const Tables = () => {
   }, [merchantApi, userInfo?.id, userToken]);
 
   useEffect(() => {
-    console.log(id, isNaN(Number(id)));
     if (isNaN(Number(id))) {
       navigate("/admin/nodes");
     }

@@ -34,6 +34,12 @@ const ServerConfig = () => {
   };
 
   useEffect(() => {
+    if (isNaN(Number(id))) {
+      navigate("/admin/nodes");
+    }
+  }, [id]);
+
+  useEffect(() => {
     if (!nodeApi) {
       setNodeApi(
         new NodeApi(

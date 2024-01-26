@@ -56,6 +56,12 @@ const RedisConfig = () => {
     }
   }, [redisConfig]);
 
+  useEffect(() => {
+    if (isNaN(Number(id))) {
+      navigate("/admin/nodes");
+    }
+  }, [id]);
+
   const successCallback = () => {
     Modal.success({
       content: "操作成功！",
