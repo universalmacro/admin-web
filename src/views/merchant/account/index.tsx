@@ -6,14 +6,7 @@ import { RiAddFill } from "react-icons/ri";
 import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
-import { DownOutlined } from "@ant-design/icons";
-import { setNode } from "features/node/nodeSlice";
 import { useParams } from "react-router-dom";
-// import {
-//   Configuration as MerchantConfig,
-//   ConfigurationParameters as MerchantConfigParam,
-//   MerchantApi,
-// } from "@universalmacro/merchant-ts-sdk";
 import sha256 from "crypto-js/sha256";
 
 import {
@@ -61,6 +54,12 @@ const Tables = () => {
 
     // getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
   }, [merchantApi, userInfo?.id, userToken]);
+
+  useEffect(() => {
+    if (isNaN(Number(id))) {
+      navigate("/admin/nodes");
+    }
+  }, [id]);
 
   const onChangePage = (page: number, pageSize: number) => {
     // getNodeList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
