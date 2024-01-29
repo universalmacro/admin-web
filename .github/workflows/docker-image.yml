@@ -5,6 +5,9 @@ on:
     branches:
       - "main"
   workflow_dispatch:
+env:
+  PORT: "11200"
+  DOCKER_NAME: "admin-web"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +27,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_NAME }}:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_NAME }}:latest
       - name: Update docker
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -32,7 +35,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_NAME }}
-            sudo docker stop ${{ vars.DOCKER_NAME }}-uat
-            sudo docker rm ${{ vars.DOCKER_NAME }}-uat
-            sudo docker run -dp ${{vars.UAT_PORT}}:80 --name ${{ vars.DOCKER_NAME }}-uat ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_NAME }}
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_NAME }}
+            sudo docker stop ${{ env.DOCKER_NAME }}-uat
+            sudo docker rm ${{ env.DOCKER_NAME }}-uat
+            sudo docker run -dp ${{env.PORT}}:80 --name ${{ env.DOCKER_NAME }}-uat ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_NAME }}

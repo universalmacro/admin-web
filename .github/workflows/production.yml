@@ -2,6 +2,9 @@ name: Production
 
 on:
   workflow_dispatch:
+env:
+  PORT: "10200"
+  DOCKER_NAME: "admin-web"
 jobs:
   Production:
     runs-on: ubuntu-latest
@@ -13,6 +16,6 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            sudo docker stop ${{ vars.DOCKER_NAME }}
-            sudo docker rm ${{ vars.DOCKER_NAME }}
-            sudo docker run -dp ${{vars.PRD_PORT}}:80 --name ${{ vars.DOCKER_NAME }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.DOCKER_NAME }}
+            sudo docker stop ${{ env.DOCKER_NAME }}
+            sudo docker rm ${{ env.DOCKER_NAME }}
+            sudo docker run -dp ${{env.PORT}}:80 --name ${{ env.DOCKER_NAME }} ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_NAME }}
