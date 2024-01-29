@@ -39,6 +39,18 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
     >
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
+          name="shortMerchantId"
+          label="shortMerchantId"
+          rules={[
+            {
+              required: true,
+              message: "請輸入shortMerchantId",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
           name="account"
           label="account"
           rules={[

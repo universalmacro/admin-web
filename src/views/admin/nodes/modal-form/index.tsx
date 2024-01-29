@@ -50,16 +50,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
         >
           <Input />
         </Form.Item>
-        <Form.Item
-          name="description"
-          label="描述"
-          rules={[
-            {
-              required: true,
-              message: "請輸入節點信息",
-            },
-          ]}
-        >
+        <Form.Item name="description" label="描述">
           <Input />
         </Form.Item>
       </Form>

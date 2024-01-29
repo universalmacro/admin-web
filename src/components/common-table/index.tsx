@@ -9,8 +9,9 @@ const CommonTable = (props: {
   onSearch?: (e: any) => void;
   onAddItem?: (e: any) => void;
   onChangePage?: (page: number, pageSize: number) => void;
+  onRow?: (record: any, rowIndex: number) => any;
 }) => {
-  const { title, loading, columns, onChangePage, onSearch, dataSource, onAddItem } = props;
+  const { title, loading, columns, onChangePage, onSearch, dataSource, onAddItem, onRow } = props;
 
   return (
     <div>
@@ -34,6 +35,7 @@ const CommonTable = (props: {
             dataSource={dataSource}
             columns={columns}
             loading={loading}
+            onRow={onRow}
             pagination={{
               onChange: onChangePage,
             }}

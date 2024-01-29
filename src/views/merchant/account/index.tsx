@@ -8,15 +8,15 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
 import { useParams } from "react-router-dom";
 import sha256 from "crypto-js/sha256";
+import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 
 import {
-  Configuration,
-  ConfigurationParameters,
-  NodeApi,
+  Configuration as MerchantConfig,
+  ConfigurationParameters as MerchantConfigParams,
   MerchantApi,
-} from "@universalmacro/core-ts-sdk";
+} from "@universalmacro/merchant-ts-sdk";
 import CommonTable from "components/common-table";
-// import { CommonTable } from "@macro-components/common";
+// import { CommonTable } from "@macro-components/common-components";
 
 const paginationConfig = {
   pageSize: 10,
@@ -33,15 +33,36 @@ const Tables = () => {
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
   const [dataSource, setDataSource] = useState([]);
+  const [nodeApi, setNodeApi] = useState(null);
+  const [nodeInfo, setNodeInfo] = useState(null);
+  const [nodeConfig, setNodeConfig] = useState(null);
 
   const { id } = useParams();
 
   const { confirm } = Modal;
 
   useEffect(() => {
-    if (!merchantApi) {
+    console.log(nodeConfig?.api?.merchantUrl, merchantApi);
+    if (nodeConfig?.api?.merchantUrl && nodeInfo?.securityKey) {
       setMerchantApi(
         new MerchantApi(
+          new MerchantConfig({
+            basePath: nodeConfig?.api?.merchantUrl,
+            headers: {
+              Authorization: `Bearer ${userToken}`,
+              ApiKey: nodeInfo?.securityKey,
+            },
+          } as MerchantConfigParams)
+        )
+      );
+    }
+    getMerchantsList(paginationConfig?.page, paginationConfig?.pageSize);
+  }, [userInfo?.id, userToken, nodeConfig]);
+
+  useEffect(() => {
+    if (!nodeApi) {
+      setNodeApi(
+        new NodeApi(
           new Configuration({
             basePath: basePath,
             headers: {
@@ -51,9 +72,33 @@ const Tables = () => {
         )
       );
     }
+    getInfo(id);
+    getConfigInfo(id);
+  }, [nodeApi, userInfo?.id, userToken, id]);
 
-    // getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
-  }, [merchantApi, userInfo?.id, userToken]);
+  const getInfo = async (id: string) => {
+    setLoading(true);
+    try {
+      const res = await nodeApi?.getNode({ id: id });
+      if (res) {
+        setNodeInfo(res);
+      }
+      setLoading(false);
+    } catch (e) {}
+  };
+
+  const getConfigInfo = async (id: string) => {
+    setLoading(true);
+    try {
+      const res = await nodeApi?.getNodeConfig({ id: id });
+      if (res) {
+        setNodeConfig(res);
+      }
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isNaN(Number(id))) {
@@ -62,34 +107,35 @@ const Tables = () => {
   }, [id]);
 
   const onChangePage = (page: number, pageSize: number) => {
-    // getNodeList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
+    getMerchantsList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
   };
 
-  // const getNodeList = async (page: number, pageSize: number) => {
-  //   setLoading(true);
-  //   try {
-  //     let pagination = {
-  //       index: page ?? paginationConfig?.page,
-  //       limit: pageSize ?? paginationConfig?.pageSize,
-  //     };
-  //     const res = await nodeApi?.listNode({ ...pagination });
-  //     setDataSource(res?.items ?? []);
-  //     setLoading(false);
-  //   } catch (e) {
-  //     setLoading(false);
-  //   }
-  // };
+  const getMerchantsList = async (page: number, pageSize: number) => {
+    if (!nodeInfo) return;
+    setLoading(true);
+    try {
+      let pagination = {
+        index: page ?? paginationConfig?.page,
+        limit: pageSize ?? paginationConfig?.pageSize,
+      };
+      const res = await merchantApi?.listMerchants({ ...pagination });
+      setDataSource(res?.items ?? []);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+    }
+  };
 
   const onSave = async (values: any) => {
     try {
-      const res = await merchantApi?.addMerchantToNode({
-        id: id,
+      const res = await merchantApi?.createMerchant({
         createMerchantRequest: {
+          shortMerchantId: values?.shortMerchantId,
           account: values?.account,
           password: sha256(sha256(values?.password).toString()).toString(),
         },
       });
-      // getAdminList(paginationConfig?.page, paginationConfig?.pageSize);
+      getMerchantsList(paginationConfig?.page, paginationConfig?.pageSize);
     } catch (e) {
       errorCallback(e);
     }
@@ -162,16 +208,16 @@ const Tables = () => {
       width: "10%",
     },
     {
-      title: "節點名稱",
-      dataIndex: "name",
-      key: "name",
+      title: "名稱",
+      dataIndex: "account",
+      key: "account",
       width: "10%",
     },
     {
       title: "描述",
       dataIndex: "description",
       key: "description",
-      width: "20%",
+      width: "10%",
       onCell: () => {
         return {
           style: {
@@ -196,21 +242,21 @@ const Tables = () => {
       },
     },
     {
-      title: "安全碼",
-      dataIndex: "securityKey",
-      key: "securityKey",
-      width: "5%",
-      render: (text: any, record: any) => {
-        if (!text) {
-          return <>無</>;
-        } else {
-          return (
-            <Tooltip title={text} overlayInnerStyle={{ width: "520px" }} trigger="click">
-              <span className="cursor-pointer text-cyan-400">查看</span>
-            </Tooltip>
-          );
-        }
-      },
+      title: "shortMerchantId",
+      dataIndex: "shortMerchantId",
+      key: "shortMerchantId",
+      width: "10%",
+      // render: (text: any, record: any) => {
+      //   if (!text) {
+      //     return <>無</>;
+      //   } else {
+      //     return (
+      //       <Tooltip title={text} overlayInnerStyle={{ width: "520px" }} trigger="click">
+      //         <span className="cursor-pointer text-cyan-400">查看</span>
+      //       </Tooltip>
+      //     );
+      //   }
+      // },
     },
     {
       title: "提交時間",
