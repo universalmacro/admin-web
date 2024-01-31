@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
-import { DownOutlined } from "@ant-design/icons";
 import * as YAML from "yaml";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 import CommonTable from "components/common-table";
@@ -358,7 +357,7 @@ const Tables = () => {
             onChangePage={onChangePage}
             onRow={(record: any, rowIndex: any) => {
               return {
-                onClick: onClickRow, // click row
+                onClick: () => onClickRow(record), // click row
               };
             }}
           />

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
-import { Modal, Tooltip, Input, Dropdown, MenuProps } from "antd";
+import type { DescriptionsProps } from "antd";
+import { Modal, Tooltip, Card, Dropdown, MenuProps, Descriptions } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -37,6 +38,8 @@ const Tables = () => {
   const [nodeConfig, setNodeConfig] = useState(null);
   const [recordVal, setRecordVal] = useState({});
   const [updateVisible, setUpdateVisible] = useState(false);
+  const [items, setItems] = useState(null);
+  const [nodeItems, setNodeItems] = useState(null);
 
   const { id } = useParams();
 
@@ -57,14 +60,14 @@ const Tables = () => {
         )
       );
     }
-    // getMerchantsList(paginationConfig?.page, paginationConfig?.pageSize);
+    getMerchantsList(paginationConfig?.page, paginationConfig?.pageSize);
   }, [userInfo?.id, userToken, nodeConfig, nodeInfo]);
 
   useEffect(() => {
     if (merchantApi && nodeConfig?.api?.merchantUrl && nodeInfo?.securityKey) {
       getMerchantsList(paginationConfig?.page, paginationConfig?.pageSize);
     }
-  }, [merchantApi, nodeConfig, nodeInfo]);
+  }, [merchantApi]);
 
   useEffect(() => {
     if (!nodeApi) {
@@ -80,9 +83,9 @@ const Tables = () => {
       );
     }
     getInfo(id);
+    // getConfigInfo(id);
   }, [nodeApi, userInfo?.id, userToken, id]);
 
-  // 需要通過節點信息和節點配置信息獲取 basePath 和 Apikey
   const getInfo = async (id: string) => {
     try {
       const res = await nodeApi?.getNode({ id: id });
@@ -93,6 +96,8 @@ const Tables = () => {
       if (res) {
         setNodeConfig(config);
       }
+      buildNodeData(res);
+      buildInfoData(config);
     } catch (e) {
       console.log(e);
     }
@@ -162,7 +167,7 @@ const Tables = () => {
 
   const successCallback = () => {
     Modal.success({
-      content: "修改成功！",
+      content: "創建成功！",
     });
   };
 
@@ -218,101 +223,40 @@ const Tables = () => {
     setVisible(true);
   };
 
-  const colums = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      width: "10%",
-    },
-    {
-      title: "名稱",
-      dataIndex: "account",
-      key: "account",
-      width: "10%",
-    },
-    {
-      title: "描述",
-      dataIndex: "description",
-      key: "description",
-      width: "10%",
-      onCell: () => {
-        return {
-          style: {
-            maxWidth: 10,
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            cursor: "pointer",
-          },
-        };
-      },
-      render: (text: any, record: any) => {
-        if (!text) {
-          return <>無</>;
-        } else {
-          return (
-            <Tooltip title={text} overlayInnerStyle={{ maxWidth: "40px" }}>
-              <span className="cursor-pointer">{text}</span>
-            </Tooltip>
-          );
-        }
-      },
-    },
-    {
-      title: "shortMerchantId",
-      dataIndex: "shortMerchantId",
-      key: "shortMerchantId",
-      width: "10%",
-      // render: (text: any, record: any) => {
-      //   if (!text) {
-      //     return <>無</>;
-      //   } else {
-      //     return (
-      //       <Tooltip title={text} overlayInnerStyle={{ width: "520px" }} trigger="click">
-      //         <span className="cursor-pointer text-cyan-400">查看</span>
-      //       </Tooltip>
-      //     );
-      //   }
-      // },
-    },
-    {
-      title: "提交時間",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      width: "14%",
-      render: (text: any, record: any) => <>{new Date(text * 1000).toLocaleString()}</>,
-    },
-    {
-      title: "更新時間",
-      dataIndex: "updatedAt",
-      key: "updatedAt",
-      width: "14%",
-      render: (text: any, record: any) => <>{new Date(text * 1000).toLocaleString()}</>,
-    },
+  const buildInfoData = (config: any) => {
+    if (!config) return;
+    let items: any = {};
+    Object.keys(config).forEach(function (key) {
+      let tmp: DescriptionsProps["items"] = [];
+      if (!config[key]) return;
+      Object.keys(config[key])?.forEach(function (configKey) {
+        tmp.push({
+          key: configKey,
+          label: configKey,
+          children: config[key][configKey],
+        });
+      });
+      items[key] = tmp;
+    });
+    console.log(items);
+    setItems(items);
+    return items;
+  };
 
-    {
-      title: "操作",
-      key: "operation",
-      hidden: userInfo?.role !== "ROOT",
-      render: (text: any, record: any) => (
-        <>
-          <a
-            className="mr-4 text-blue-400"
-            onClick={() => {
-              setRecordVal(record);
-              onUpdate(record);
-            }}
-          >
-            更新密碼
-          </a>
-          <a className="text-red-400" onClick={() => handleDelete(record)}>
-            刪除
-          </a>
-        </>
-      ),
-    },
-  ].filter((item) => !item.hidden);
+  const buildNodeData = (info: any) => {
+    if (!info) return;
+    let items: DescriptionsProps["items"] = [];
+
+    Object.keys(info)?.forEach(function (configKey) {
+      items.push({
+        key: configKey,
+        label: configKey,
+        children: info[configKey],
+      });
+    });
+
+    setNodeItems(items);
+  };
 
   return (
     <div>
@@ -333,17 +277,27 @@ const Tables = () => {
         }}
       />
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
-        <div>
-          <CommonTable
-            title="帳號列表"
-            onAddItem={addPerson}
-            onSearch={search}
-            dataSource={dataSource}
-            columns={colums}
-            loading={loading}
-            onChangePage={onChangePage}
-          />
+        <div className="mt-5 grid h-full grid-cols-1 gap-5">
+          <p className="mb-4 text-xl">節點詳情</p>
         </div>
+        <Descriptions layout="vertical" bordered items={nodeItems} />
+        <div className="mt-5 grid h-full grid-cols-1 gap-5">
+          <p className="mb-4 text-xl">配置信息</p>
+        </div>
+        {items &&
+          Object.keys(items)?.map((key: any) => {
+            return (
+              <div className="mt- 5">
+                <Card
+                  title={key}
+                  extra={<a href={`/nodes/${id}/config/${key}`}>前往編輯</a>}
+                  style={{ width: "80%" }}
+                >
+                  <Descriptions layout="vertical" items={items[key]} />
+                </Card>
+              </div>
+            );
+          })}
       </div>
     </div>
   );

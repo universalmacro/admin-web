@@ -7,7 +7,7 @@ import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import ItemInfo from "views/info/ItemInfo";
 import ConfigLayout from "layouts/config";
-import MerchantLayout from "layouts/merchant";
+import DetailLayout from "layouts/detail";
 
 const App = () => {
   return (
@@ -41,10 +41,10 @@ const App = () => {
       />
 
       <Route
-        path="nodes/:id/*"
+        path="nodes/:id/details"
         element={
           <PrivateRoute>
-            <MerchantLayout />
+            <DetailLayout />
           </PrivateRoute>
         }
       />

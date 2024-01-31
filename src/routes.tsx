@@ -19,6 +19,9 @@ import FrontendDomainConfig from "views/config/frontendDomain";
 // Merchants
 import MerchantConfig from "views/merchant/account";
 
+// Detailss
+import DetailPage from "views/details/detail";
+
 // Icon Imports
 import {
   MdBarChart,
@@ -32,6 +35,7 @@ import { CiServer } from "react-icons/ci";
 import { TbApi } from "react-icons/tb";
 import { SiRedis } from "react-icons/si";
 import { CgProfile } from "react-icons/cg";
+import { BiDetail } from "react-icons/bi";
 
 const routes = [
   {
@@ -152,6 +156,25 @@ const merchantsRoutes = [
   },
 ];
 
+const detailRoute = [
+  {
+    name: "節點列表",
+    layout: "/admin",
+    icon: <FaShareNodes className="h-6 w-6" />,
+    path: "nodes",
+    component: <NodeTables />,
+    secondary: false,
+  },
+  {
+    name: "信息",
+    layout: "/details",
+    icon: <BiDetail className="h-6 w-6" />,
+    path: "details",
+    component: <DetailPage />,
+    secondary: true,
+  },
+];
+
 const testRoutes: Array<{ name: string; children: RoutesType[] }> = [
   {
     name: "節點配置",
@@ -215,4 +238,4 @@ const testRoutes: Array<{ name: string; children: RoutesType[] }> = [
 
 export default routes;
 
-export { configRoutes, merchantsRoutes, testRoutes };
+export { configRoutes, merchantsRoutes, testRoutes, detailRoute };

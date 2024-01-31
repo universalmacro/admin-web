@@ -1,12 +1,11 @@
 /* eslint-disable */
 import React, { useEffect } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import DashIcon from "components/icons/DashIcon";
 
-export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
+export const SidebarLinks = (props: { routes: RoutesType[]; id: string }): JSX.Element => {
   let location = useLocation();
-  const { routes } = props;
-  const { id } = useParams();
+  const { routes, id } = props;
 
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName: string) => {
@@ -15,11 +14,11 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
     return routeName.includes(subRoute);
   };
 
-  const createLinks = (routes: RoutesType[]) => {
-    return routes?.map((route, index) => {
+  const createLinks = (routes: RoutesType[], id: string) => {
+    return routes.map((route, index) => {
       if (
         route.layout === "/admin" ||
-        route.layout === "/auth" ||
+        route.layout === "/details" ||
         route.layout === "/rtl" ||
         route.layout === "/nodes"
       ) {
@@ -28,7 +27,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
             key={index}
             to={
               route?.secondary
-                ? route.layout + "/" + id + "/config/" + route.path
+                ? route.layout + "/" + id + "/" + route.path
                 : route.layout + "/" + route.path
             }
           >
@@ -63,7 +62,7 @@ export const SidebarLinks = (props: { routes: RoutesType[] }): JSX.Element => {
     });
   };
   // BRAND
-  return <>{createLinks(routes)}</>;
+  return <>{createLinks(routes, id)}</>;
 };
 
 export default SidebarLinks;
