@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Modal, Form, Input } from "antd";
 
 interface ModalFormProps {
@@ -8,20 +7,13 @@ interface ModalFormProps {
   onCancel: () => void;
 }
 
-const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
+const UpdateModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel }) => {
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    form.setFieldsValue({
-      name: state.name,
-      description: state.description,
-    });
-  }, [state?.name]);
 
   return (
     <Modal
       open={visible}
-      title="新增節點"
+      title="更新密碼"
       okText="確認"
       cancelText="取消"
       onCancel={onCancel}
@@ -30,7 +22,7 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
           .validateFields()
           .then((values) => {
             form.resetFields();
-            onSave({ ...values });
+            onSave({ ...values, id: state?.id });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -39,23 +31,32 @@ const ModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onCancel 
     >
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
-          name="name"
-          label="節點名稱"
+          name="oldPassword"
+          label="舊密碼"
           rules={[
             {
               required: true,
-              message: "請輸入節點名稱",
+              message: "請輸入舊密碼",
             },
           ]}
         >
-          <Input />
+          <Input.Password />
         </Form.Item>
-        <Form.Item name="description" label="描述">
-          <Input />
+        <Form.Item
+          name="password"
+          label="新密碼"
+          rules={[
+            {
+              required: true,
+              message: "請輸入新密碼",
+            },
+          ]}
+        >
+          <Input.Password />
         </Form.Item>
       </Form>
     </Modal>
   );
 };
 
-export default ModalForm;
+export default UpdateModalForm;

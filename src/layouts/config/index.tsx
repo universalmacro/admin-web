@@ -6,6 +6,7 @@ import Footer from "components/footer/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { configRoutes } from "routes";
 import { AppDispatch } from "../../store";
+import { testRoutes } from "routes";
 
 export default function Config(props: { [x: string]: any }) {
   const { ...rest } = props;
@@ -23,45 +24,64 @@ export default function Config(props: { [x: string]: any }) {
     );
   }, []);
   React.useEffect(() => {
-    getActiveRoute(configRoutes);
+    getActiveRoute(testRoutes);
   }, [location.pathname]);
 
-  const getActiveRoute = (routes: RoutesType[]): string | boolean => {
+  const getActiveRoute = (routesConfig: any): string | boolean => {
     let activeRoute = "database";
-    for (let i = 0; i < routes.length; i++) {
-      if (
-        window.location.href.indexOf(
-          routes[i].layout + "/" + nodeId + "/config/" + routes[i].path
-        ) !== -1
-      ) {
-        setCurrentRoute(routes[i].name);
+    for (let j = 0; j < routesConfig?.length; j++) {
+      let routes = routesConfig?.[j].children;
+      for (let i = 0; i < routes?.length; i++) {
+        if (
+          window.location.href.indexOf(
+            routes[i].layout + "/" + nodeId + "/config/" + routes[i].path
+          ) !== -1
+        ) {
+          setCurrentRoute(routes[i].name);
+        }
       }
     }
+
     return activeRoute;
   };
-  const getActiveNavbar = (routes: RoutesType[]): string | boolean => {
+  const getActiveNavbar = (routesConfig: any): string | boolean => {
     let activeNavbar = false;
-    for (let i = 0; i < routes.length; i++) {
-      if (window.location.href.indexOf(routes[i].layout + routes[i].path) !== -1) {
-        return routes[i].secondary;
+    for (let j = 0; j < routesConfig?.length; j++) {
+      let routes = routesConfig?.[j].children;
+
+      for (let i = 0; i < routes?.length; i++) {
+        if (
+          window.location.href.indexOf(
+            routes[i].layout + "/" + nodeId + "/config/" + routes[i].path
+          ) !== -1
+        ) {
+          return routes[i].secondary;
+        }
       }
     }
     return activeNavbar;
   };
-  const getRoutes = (routes: RoutesType[]): any => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/nodes") {
-        return <Route path={`${prop.path}`} element={prop.component} key={key} />;
-      } else {
-        return null;
-      }
-    });
+  const getRoutes = (routesConfig: any): any => {
+    let routeList = [];
+    for (let j = 0; j < routesConfig?.length; j++) {
+      let routes = routesConfig?.[j].children;
+      routeList.push(
+        routes?.map((prop: any, key: any) => {
+          if (prop.layout === "/nodes") {
+            return <Route path={`${prop.path}`} element={prop.component} key={key} />;
+          } else {
+            return null;
+          }
+        })
+      );
+    }
+    return routeList;
   };
 
   document.documentElement.dir = "ltr";
   return (
     <div className="flex h-full w-full">
-      <Sidebar open={open} onClose={() => setOpen(false)} />
+      <Sidebar open={open} onClose={() => setOpen(false)} routeConifg={testRoutes} />
       {/* Navbar & Main Content */}
       <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
         {/* Main Content */}
@@ -71,14 +91,14 @@ export default function Config(props: { [x: string]: any }) {
             <Navbar
               onOpenSidenav={() => setOpen(true)}
               brandText={currentRoute}
-              secondary={getActiveNavbar(configRoutes)}
+              secondary={getActiveNavbar(testRoutes)}
               {...rest}
             />
-            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
+            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-4 md:pr-2">
               <Routes>
-                {getRoutes(configRoutes)}
+                {getRoutes(testRoutes)}
 
-                <Route path="/" element={<Navigate to="/nodes/database" replace />} />
+                <Route path="/" element={<Navigate to="/admin/nodes" replace />} />
               </Routes>
             </div>
             <div className="p-3">

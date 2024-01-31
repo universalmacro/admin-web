@@ -8,18 +8,18 @@ export const getRestaurantInfo = createAsyncThunk(
   async ({ token }: any, { rejectWithValue }) => {
     try {
       // const { data } = await restaurantApi.listRestaurants();
-      const { data } = await axios.get(`${restaurantBasePath}/restaurants`, {
-        headers: {
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-      const list = data?.data;
-      if (list && list?.length > 0) {
-        // localStorage.setItem('restaurantId', list[0]?.id);
-      }
-      console.log(list);
-      return list;
+      // const { data } = await axios.get(`${restaurantBasePath}/restaurants`, {
+      //   headers: {
+      //     'Content-Type': 'application/json;charset=UTF-8',
+      //     'Authorization': `Bearer ${token}`,
+      //   }
+      // });
+      // const list = data?.data;
+      // if (list && list?.length > 0) {
+      //   // localStorage.setItem('restaurantId', list[0]?.id);
+      // }
+      // console.log(list);
+      // return list;
     } catch (error: any) {
       // return custom error message from API if any
       if (error.response && error.response.data.message) {

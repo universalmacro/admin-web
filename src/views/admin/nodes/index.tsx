@@ -5,8 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
-import { DownOutlined } from "@ant-design/icons";
-
+import * as YAML from "yaml";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 import CommonTable from "components/common-table";
 // import { CommonTable } from "@macro-components/common-components";
@@ -21,6 +20,7 @@ const items: MenuProps["items"] = [
   { key: "server", label: "server" },
   { key: "redis", label: "redis" },
   { key: "api", label: "api" },
+  { key: "frontendDomain", label: "frontendDomain" },
 ];
 
 const Tables = () => {
@@ -38,6 +38,29 @@ const Tables = () => {
 
   const onChangePage = (page: number, pageSize: number) => {
     getNodeList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
+  };
+
+  const exportInfo = (info: any, id: string) => {
+    const fileData = YAML.stringify(info);
+    const blob = new Blob([fileData], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.download = `${id}.yaml`;
+    link.href = url;
+    link.click();
+  };
+
+  const handleDownload = (record: any) => {
+    let config = {
+      core: {
+        apiUrl: "https://uat.api.universalmacro.com/core",
+      },
+      node: {
+        id: record?.id,
+        secretKey: record?.securityKey,
+      },
+    };
+    exportInfo(config, record?.id);
   };
 
   const getNodeList = async (page: number, pageSize: number) => {
@@ -76,7 +99,7 @@ const Tables = () => {
       const res = await nodeApi.createNode({
         createNodeRequest: {
           name: values?.name,
-          description: values?.description,
+          description: values?.description ?? "",
         },
       });
       successCallback();
@@ -156,6 +179,10 @@ const Tables = () => {
     setVisible(true);
   };
 
+  const onClickRow = (record: any) => {
+    navigate(`/nodes/${record?.id}/details`);
+  };
+
   const colums = [
     {
       title: "ID",
@@ -209,13 +236,18 @@ const Tables = () => {
           return (
             <>
               <Tooltip title={text} overlayInnerStyle={{ width: "520px" }} trigger="click">
-                <span className="mr-4 cursor-pointer text-cyan-400">查看</span>
+                <span
+                  className="mr-4 cursor-pointer text-cyan-400"
+                  onClick={(e: any) => e.stopPropagation()}
+                >
+                  查看
+                </span>
               </Tooltip>
 
               <span
                 className="cursor-pointer text-cyan-400"
-                onClick={() => {
-                  // navigator.clipboard.writeText(text);
+                onClick={(e: any) => {
+                  e.stopPropagation();
                   copySuccess();
                 }}
               >
@@ -248,7 +280,7 @@ const Tables = () => {
       hidden: userInfo?.role !== "ROOT",
       render: (text: any, record: any) => (
         <>
-          <Dropdown
+          {/* <Dropdown
             menu={{
               items,
               onClick: ({ key }) => {
@@ -260,7 +292,7 @@ const Tables = () => {
             <a className="mr-4 text-blue-400">
               配置 <DownOutlined />
             </a>
-          </Dropdown>
+          </Dropdown> */}
           {/* <a
             className="mr-4 text-blue-400"
             onClick={() => {
@@ -271,14 +303,31 @@ const Tables = () => {
           </a> */}
           <a
             className="mr-4 text-blue-400"
-            onClick={() => {
-              navigate(`/nodes/${record?.id}/merchant`);
+            onClick={(e: any) => {
+              e.stopPropagation();
+              navigate(`/nodes/${record?.id}/config/database`);
             }}
           >
-            帳號管理
+            配置
           </a>
-          <a className="text-red-400" onClick={() => handleDelete(record)}>
+
+          <a
+            className="mr-4 text-red-400"
+            onClick={(e: any) => {
+              e.stopPropagation();
+              handleDelete(record);
+            }}
+          >
             刪除
+          </a>
+          <a
+            className="text-cyan-400"
+            onClick={(e: any) => {
+              e.stopPropagation();
+              handleDownload(record);
+            }}
+          >
+            下載
           </a>
         </>
       ),
@@ -306,6 +355,11 @@ const Tables = () => {
             columns={colums}
             loading={loading}
             onChangePage={onChangePage}
+            onRow={(record: any, rowIndex: any) => {
+              return {
+                onClick: () => onClickRow(record), // click row
+              };
+            }}
           />
         </div>
       </div>

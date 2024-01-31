@@ -14,16 +14,28 @@ import DatabaseConfig from "views/config/database";
 import ServerConfig from "views/config/server";
 import RedisConfig from "views/config/redis";
 import ApiConfig from "views/config/api";
+import FrontendDomainConfig from "views/config/frontendDomain";
 
 // Merchants
 import MerchantConfig from "views/merchant/account";
 
+// Detailss
+import DetailPage from "views/details/detail";
+
 // Icon Imports
-import { MdBarChart, MdLock, MdPeopleAlt } from "react-icons/md";
-import { FaShareNodes, FaDatabase, FaServer } from "react-icons/fa6";
+import {
+  MdBarChart,
+  MdLock,
+  MdPeopleAlt,
+  MdBlurLinear,
+  MdOutlineSwitchAccount,
+} from "react-icons/md";
+import { FaShareNodes, FaDatabase } from "react-icons/fa6";
+import { CiServer } from "react-icons/ci";
 import { TbApi } from "react-icons/tb";
 import { SiRedis } from "react-icons/si";
 import { CgProfile } from "react-icons/cg";
+import { BiDetail } from "react-icons/bi";
 
 const routes = [
   {
@@ -93,7 +105,7 @@ const configRoutes = [
   {
     name: "server",
     layout: "/nodes",
-    icon: <FaServer className="h-6 w-6" />,
+    icon: <CiServer className="h-6 w-6" />,
     path: "server",
     component: <ServerConfig />,
     secondary: true,
@@ -112,6 +124,14 @@ const configRoutes = [
     icon: <TbApi className="h-6 w-6" />,
     path: "api",
     component: <ApiConfig />,
+    secondary: true,
+  },
+  {
+    name: "frontendDomain",
+    layout: "/nodes",
+    icon: <MdBlurLinear className="h-6 w-6" />,
+    path: "frontendDomain",
+    component: <FrontendDomainConfig />,
     secondary: true,
   },
 ];
@@ -136,6 +156,86 @@ const merchantsRoutes = [
   },
 ];
 
+const detailRoute = [
+  {
+    name: "節點列表",
+    layout: "/admin",
+    icon: <FaShareNodes className="h-6 w-6" />,
+    path: "nodes",
+    component: <NodeTables />,
+    secondary: false,
+  },
+  {
+    name: "信息",
+    layout: "/details",
+    icon: <BiDetail className="h-6 w-6" />,
+    path: "details",
+    component: <DetailPage />,
+    secondary: true,
+  },
+];
+
+const testRoutes: Array<{ name: string; children: RoutesType[] }> = [
+  {
+    name: "節點配置",
+    children: [
+      {
+        name: "database",
+        layout: "/nodes",
+        icon: <FaDatabase className="h-6 w-6" />,
+        path: "database",
+        component: <DatabaseConfig />,
+        secondary: true,
+      },
+      {
+        name: "server",
+        layout: "/nodes",
+        icon: <CiServer className="h-6 w-6" />,
+        path: "server",
+        component: <ServerConfig />,
+        secondary: true,
+      },
+      {
+        name: "redis",
+        layout: "/nodes",
+        icon: <SiRedis className="h-6 w-6" />,
+        path: "redis",
+        component: <RedisConfig />,
+        secondary: true,
+      },
+      {
+        name: "api",
+        layout: "/nodes",
+        icon: <TbApi className="h-6 w-6" />,
+        path: "api",
+        component: <ApiConfig />,
+        secondary: true,
+      },
+      {
+        name: "frontendDomain",
+        layout: "/nodes",
+        icon: <MdBlurLinear className="h-6 w-6" />,
+        path: "frontendDomain",
+        component: <FrontendDomainConfig />,
+        secondary: true,
+      },
+    ],
+  },
+  {
+    name: "帳號配置",
+    children: [
+      {
+        name: "merchant",
+        layout: "/nodes",
+        icon: <MdOutlineSwitchAccount className="h-6 w-6" />,
+        path: "merchant",
+        component: <MerchantConfig />,
+        secondary: true,
+      },
+    ],
+  },
+];
+
 export default routes;
 
-export { configRoutes, merchantsRoutes };
+export { configRoutes, merchantsRoutes, testRoutes, detailRoute };

@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
-import Sidebar from "components/merchants-sidebar";
+import Sidebar from "./sidebar";
 import Footer from "components/footer/Footer";
 import { useDispatch, useSelector } from "react-redux";
-import { merchantsRoutes } from "routes";
+import { detailRoute } from "routes";
 import { AppDispatch } from "../../store";
 import axios from "axios";
 import { basePath } from "../../api";
@@ -13,7 +13,7 @@ export default function Config(props: { [x: string]: any }) {
   const { ...rest } = props;
   const location = useLocation();
   const [open, setOpen] = React.useState(true);
-  const [currentRoute, setCurrentRoute] = React.useState("database");
+  const [currentRoute, setCurrentRoute] = React.useState("details");
   const dispatch = useDispatch<AppDispatch>();
   const { userToken } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
@@ -26,11 +26,11 @@ export default function Config(props: { [x: string]: any }) {
     );
   }, []);
   React.useEffect(() => {
-    getActiveRoute(merchantsRoutes);
+    getActiveRoute(detailRoute);
   }, [location.pathname]);
 
   const getActiveRoute = (routes: RoutesType[]): string | boolean => {
-    let activeRoute = "merchant";
+    let activeRoute = "details";
     for (let i = 0; i < routes.length; i++) {
       if (
         window.location.href.indexOf(routes[i].layout + "/" + nodeId + "/" + routes[i].path) !== -1
@@ -51,8 +51,9 @@ export default function Config(props: { [x: string]: any }) {
   };
   const getRoutes = (routes: RoutesType[]): any => {
     return routes.map((prop, key) => {
-      if (prop.layout === "/merchant") {
-        return <Route path={`${prop.path}`} element={prop.component} key={key} />;
+      if (prop.layout === "/details") {
+        console.log(prop.path);
+        return <Route path={`/`} element={prop.component} key={key} />;
       } else {
         return null;
       }
@@ -72,11 +73,11 @@ export default function Config(props: { [x: string]: any }) {
             <Navbar
               onOpenSidenav={() => setOpen(true)}
               brandText={currentRoute}
-              secondary={getActiveNavbar(merchantsRoutes)}
+              secondary={getActiveNavbar(detailRoute)}
               {...rest}
             />
             <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-2 md:pr-2">
-              <Routes>{getRoutes(merchantsRoutes)}</Routes>
+              <Routes>{getRoutes(detailRoute)}</Routes>
             </div>
             <div className="p-3">
               <Footer />
