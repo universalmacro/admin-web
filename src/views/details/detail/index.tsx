@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { basePath } from "api";
 import type { DescriptionsProps } from "antd";
-import { Modal, Tooltip, Card, Dropdown, MenuProps, Descriptions } from "antd";
+import { Modal, Tooltip, Card, Button, MenuProps, Descriptions } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
 import { useParams } from "react-router-dom";
 import sha256 from "crypto-js/sha256";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 import UpdateModalForm from "./update-modal-form";
+import DownLoadNodeConfigBtn from "components/download-node-config";
+import CopyTextBtn from "components/copy-text";
 
 import {
   Configuration as MerchantConfig,
@@ -17,6 +18,7 @@ import {
   MerchantApi,
 } from "@universalmacro/merchant-ts-sdk";
 import CommonTable from "components/common-table";
+import { BiDownload } from "react-icons/bi";
 // import { CommonTable } from "@macro-components/common-components";
 
 const paginationConfig = {
@@ -248,11 +250,30 @@ const Tables = () => {
     let items: DescriptionsProps["items"] = [];
 
     Object.keys(info)?.forEach(function (configKey) {
-      items.push({
-        key: configKey,
-        label: configKey,
-        children: info[configKey],
-      });
+      if (configKey == "createdAt" || configKey == "updatedAt") {
+        items.push({
+          key: configKey,
+          label: configKey,
+          children: new Date(info[configKey] * 1000).toLocaleString(),
+        });
+      } else if (configKey == "securityKey") {
+        items.push({
+          key: configKey,
+          label: configKey,
+          children: (
+            <>
+              {info[configKey]}
+              <CopyTextBtn text={info[configKey]} className={"ml-[8px]"} />
+            </>
+          ),
+        });
+      } else {
+        items.push({
+          key: configKey,
+          label: configKey,
+          children: info[configKey],
+        });
+      }
     });
 
     setNodeItems(items);
@@ -278,7 +299,12 @@ const Tables = () => {
       />
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <div className="mt-5 grid h-full grid-cols-1 gap-5">
-          <p className="mb-4 text-xl">節點詳情</p>
+          <div className="flex justify-between">
+            <p className="mb-4 text-xl">節點詳情</p>
+            <Button onClick={() => navigate("/info")} icon={<BiDownload />}>
+              <DownLoadNodeConfigBtn record={nodeInfo} />
+            </Button>
+          </div>
         </div>
         <Descriptions layout="vertical" bordered items={nodeItems} />
         <div className="mt-5 grid h-full grid-cols-1 gap-5">
@@ -290,7 +316,11 @@ const Tables = () => {
               <div className="mt- 5">
                 <Card
                   title={key}
-                  extra={<a href={`/nodes/${id}/config/${key}`}>前往編輯</a>}
+                  extra={
+                    <>
+                      <a href={`/nodes/${id}/config/${key}`}>前往編輯</a>
+                    </>
+                  }
                   style={{ width: "80%" }}
                 >
                   <Descriptions layout="vertical" items={items[key]} />

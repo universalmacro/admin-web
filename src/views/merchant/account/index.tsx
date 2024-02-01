@@ -17,6 +17,7 @@ import {
 } from "@universalmacro/merchant-ts-sdk";
 import CommonTable from "components/common-table";
 // import { CommonTable } from "@macro-components/common-components";
+// import "@macro-components/common-components/dist/style.css";
 
 const paginationConfig = {
   pageSize: 10,
