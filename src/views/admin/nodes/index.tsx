@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { basePath } from "api";
 import { Table, message, Modal, Tooltip, Input, Dropdown, MenuProps } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../store";
 import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
 import * as YAML from "yaml";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
 import CommonTable from "components/common-table";
 // import { CommonTable } from "@macro-components/common-components";
+import DownLoadNodeConfigBtn from "components/download-node-config";
+import CopyTextBtn from "components/copy-text";
 
 const paginationConfig = {
   pageSize: 10,
@@ -25,7 +26,6 @@ const items: MenuProps["items"] = [
 
 const Tables = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
   const [nodeApi, setNodeApi] = useState(null);
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,34 +33,10 @@ const Tables = () => {
   const { userToken, userInfo } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
   const [dataSource, setDataSource] = useState([]);
-  const [messageApi, contextHolder] = message.useMessage();
   const { confirm } = Modal;
 
   const onChangePage = (page: number, pageSize: number) => {
     getNodeList(page ?? paginationConfig?.page, pageSize ?? paginationConfig?.pageSize);
-  };
-
-  const exportInfo = (info: any, id: string) => {
-    const fileData = YAML.stringify(info);
-    const blob = new Blob([fileData], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.download = `${id}.yaml`;
-    link.href = url;
-    link.click();
-  };
-
-  const handleDownload = (record: any) => {
-    let config = {
-      core: {
-        apiUrl: "https://uat.api.universalmacro.com/core",
-      },
-      node: {
-        id: record?.id,
-        secretKey: record?.securityKey,
-      },
-    };
-    exportInfo(config, record?.id);
   };
 
   const getNodeList = async (page: number, pageSize: number) => {
@@ -117,13 +93,6 @@ const Tables = () => {
   const successCallback = () => {
     Modal.success({
       content: "創建成功！",
-    });
-  };
-
-  const copySuccess = () => {
-    messageApi.open({
-      type: "success",
-      content: "複製成功",
     });
   };
 
@@ -244,15 +213,7 @@ const Tables = () => {
                 </span>
               </Tooltip>
 
-              <span
-                className="cursor-pointer text-cyan-400"
-                onClick={(e: any) => {
-                  e.stopPropagation();
-                  copySuccess();
-                }}
-              >
-                複製
-              </span>
+              <CopyTextBtn text={text} />
             </>
           );
         }
@@ -280,55 +241,26 @@ const Tables = () => {
       hidden: userInfo?.role !== "ROOT",
       render: (text: any, record: any) => (
         <>
-          {/* <Dropdown
-            menu={{
-              items,
-              onClick: ({ key }) => {
-                // dispatch(setNode(record));
-                toConfig(key, record);
-              },
-            }}
-          >
-            <a className="mr-4 text-blue-400">
-              配置 <DownOutlined />
-            </a>
-          </Dropdown> */}
-          {/* <a
-            className="mr-4 text-blue-400"
-            onClick={() => {
-              getInfo(record);
-            }}
-          >
-            詳情
-          </a> */}
-          <a
-            className="mr-4 text-blue-400"
+          <span
+            className="mr-4 cursor-pointer text-blue-400"
             onClick={(e: any) => {
               e.stopPropagation();
               navigate(`/nodes/${record?.id}/config/database`);
             }}
           >
             配置
-          </a>
+          </span>
 
-          <a
-            className="mr-4 text-red-400"
+          <span
+            className="mr-4 cursor-pointer text-red-400"
             onClick={(e: any) => {
               e.stopPropagation();
               handleDelete(record);
             }}
           >
             刪除
-          </a>
-          <a
-            className="text-cyan-400"
-            onClick={(e: any) => {
-              e.stopPropagation();
-              handleDownload(record);
-            }}
-          >
-            下載
-          </a>
+          </span>
+          <DownLoadNodeConfigBtn record={record} />
         </>
       ),
     },
@@ -344,7 +276,7 @@ const Tables = () => {
           setVisible(false);
         }}
       />
-      {contextHolder}
+      {/* {contextHolder} */}
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
         <div>
           <CommonTable
