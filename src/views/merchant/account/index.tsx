@@ -146,7 +146,7 @@ const Tables = () => {
       const res = await merchantApi?.updateMerchantPassword({
         id: values?.id,
         updatePasswordRequest: {
-          oldPassword: sha256(sha256(values?.password).toString()).toString(),
+          // oldPassword: sha256(sha256(values?.password).toString()).toString(),
           password: sha256(sha256(values?.password).toString()).toString(),
         },
       });

@@ -22,7 +22,7 @@ const FrontendDomainConfig = () => {
     try {
       const res = await nodeApi?.getNodeConfig({ id: id });
       if (res) {
-        setFrontendDomainConfig(res?.api);
+        setFrontendDomainConfig(res?.frontendDomain);
       }
       setLoading(false);
     } catch (e) {
@@ -58,7 +58,7 @@ const FrontendDomainConfig = () => {
   useEffect(() => {
     if (frontendDomain) {
       form.setFieldsValue({
-        ...frontendDomain,
+        frontendDomain,
       });
     }
   }, [frontendDomain]);

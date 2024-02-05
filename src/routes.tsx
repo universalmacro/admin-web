@@ -36,6 +36,7 @@ import { TbApi } from "react-icons/tb";
 import { SiRedis } from "react-icons/si";
 import { CgProfile } from "react-icons/cg";
 import { BiDetail } from "react-icons/bi";
+import Authenticator from "views/authentication/index";
 
 const routes = [
   {
@@ -65,6 +66,13 @@ const routes = [
     icon: <CgProfile className="h-6 w-6" />,
     path: "profile",
     component: <Profile />,
+  },
+  {
+    name: "Authentication",
+    layout: "/admin",
+    path: "auth",
+    icon: <MdLock className="h-6 w-6" />,
+    component: <Authenticator />,
   },
   {
     name: "配置",
