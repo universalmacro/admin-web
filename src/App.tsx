@@ -9,6 +9,8 @@ import ItemInfo from "views/info/ItemInfo";
 import ConfigLayout from "layouts/config";
 import DetailLayout from "layouts/detail";
 
+import Authenticator from "components/authenticator";
+
 const App = () => {
   return (
     <Routes>
@@ -29,6 +31,7 @@ const App = () => {
           </PrivateRoute>
         }
       />
+
       <Route path="info/*" element={<ItemInfo />} />
       <Route path="rtl/*" element={<RtlLayout />} />
       <Route

@@ -31,18 +31,6 @@ const UpdateModalForm: React.FC<ModalFormProps> = ({ state, visible, onSave, onC
     >
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
-          name="oldPassword"
-          label="舊密碼"
-          rules={[
-            {
-              required: true,
-              message: "請輸入舊密碼",
-            },
-          ]}
-        >
-          <Input.Password />
-        </Form.Item>
-        <Form.Item
           name="password"
           label="新密碼"
           rules={[
