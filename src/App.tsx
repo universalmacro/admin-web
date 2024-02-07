@@ -9,7 +9,7 @@ import ItemInfo from "views/info/ItemInfo";
 import ConfigLayout from "layouts/config";
 import DetailLayout from "layouts/detail";
 
-import Authenticator from "components/authenticator";
+import { NotFound } from "views/notfound";
 
 const App = () => {
   return (
@@ -56,6 +56,7 @@ const App = () => {
       {/* <Route path="nodes/*" element={<ConfigLayout />} /> */}
 
       {/* <Route path="nodes/:id/*" element={<MerchantLayout />} /> */}
+      <Route path="*" element={<NotFound />} />
 
       <Route path="/" element={<Navigate to="admin/" replace />} />
     </Routes>

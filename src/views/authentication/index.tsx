@@ -1,14 +1,9 @@
 /* eslint-disable */
 import { useState, useEffect } from "react";
-import speakeasy from "speakeasy";
 import QRCode from "qrcode";
-import CryptoJS from "crypto-js";
-
-import { Modal } from "antd";
 import { updateSelfPassword, basePath } from "api";
-
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Form, Input, Card, Spin } from "antd";
+import { Modal, Button, Form, Input, Card, Spin } from "antd";
 import { AppDispatch } from "../../store";
 import { userInfoAuth } from "features/auth/authActions";
 import sha256 from "crypto-js/sha256";
@@ -111,17 +106,6 @@ const Authenticator = () => {
     } catch (e) {
       errorCallback(e);
     }
-  };
-
-  const getCode = () => {
-    const { base32, hex } = secret;
-    const code = speakeasy.totp({
-      secret: hex,
-      encoding: "hex",
-      algorithm: "sha1",
-    });
-
-    setValidCode(code);
   };
 
   const onSave = async () => {
