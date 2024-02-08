@@ -15,14 +15,6 @@ const App = () => {
   return (
     <Routes>
       <Route path="auth/*" element={<AuthLayout />} />
-      {/* <Route  path='/' element={<PrivateRoute />}>
-        <Route path="admin/*" element={<AdminLayout />}>
-        </Route> */}
-
-      {/* <Route path="admin/*" element={<PrivateRoute />}>
-        <Route path="admin/*" element={<AdminLayout />} />
-      </Route> */}
-      {/* <PrivateRoute path="admin/*" element={<AdminLayout />} /> */}
       <Route
         path="admin/*"
         element={
@@ -31,8 +23,14 @@ const App = () => {
           </PrivateRoute>
         }
       />
-
-      <Route path="info/*" element={<ItemInfo />} />
+      <Route
+        path="info/*"
+        element={
+          <PrivateRoute>
+            <ItemInfo />
+          </PrivateRoute>
+        }
+      />
       <Route path="rtl/*" element={<RtlLayout />} />
       <Route
         path="nodes/:id/config/*"

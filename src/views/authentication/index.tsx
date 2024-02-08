@@ -126,18 +126,6 @@ const Authenticator = () => {
     }
   };
 
-  const verifyCode = () => {
-    // const { base32, hex } = secret;
-    // const isVerified = speakeasy.totp.verify({
-    //   secret: hex,
-    //   encoding: "hex",
-    //   token: inputValue,
-    //   window: 1,
-    // });
-    // console.log("isVerified -->", isVerified);
-    // setIsCodeValid(isVerified);
-  };
-
   return (
     <div>
       <div className="mt-5 grid h-full grid-cols-1 gap-5">
