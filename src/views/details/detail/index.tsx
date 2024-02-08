@@ -231,12 +231,21 @@ const Tables = () => {
     Object.keys(config).forEach(function (key) {
       let tmp: DescriptionsProps["items"] = [];
       if (!config[key]) return;
-      Object.keys(config[key])?.forEach(function (configKey) {
+      if (typeof config[key] == "string") {
         tmp.push({
-          key: configKey,
-          label: configKey,
-          children: config[key][configKey],
+          key: key,
+          label: key,
+          children: config[key],
         });
+      }
+      Object.keys(config[key])?.forEach(function (configKey) {
+        if (typeof config[key] != "string") {
+          tmp.push({
+            key: configKey,
+            label: configKey,
+            children: config[key][configKey],
+          });
+        }
       });
       items[key] = tmp;
     });

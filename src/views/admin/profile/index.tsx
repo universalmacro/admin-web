@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { updateSelfPassword, basePath } from "api";
+import { basePath } from "api";
 import { Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Form, Input, Select } from "antd";

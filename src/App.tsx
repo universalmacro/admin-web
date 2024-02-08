@@ -9,20 +9,12 @@ import ItemInfo from "views/info/ItemInfo";
 import ConfigLayout from "layouts/config";
 import DetailLayout from "layouts/detail";
 
-import Authenticator from "components/authenticator";
+import { NotFound } from "views/notfound";
 
 const App = () => {
   return (
     <Routes>
       <Route path="auth/*" element={<AuthLayout />} />
-      {/* <Route  path='/' element={<PrivateRoute />}>
-        <Route path="admin/*" element={<AdminLayout />}>
-        </Route> */}
-
-      {/* <Route path="admin/*" element={<PrivateRoute />}>
-        <Route path="admin/*" element={<AdminLayout />} />
-      </Route> */}
-      {/* <PrivateRoute path="admin/*" element={<AdminLayout />} /> */}
       <Route
         path="admin/*"
         element={
@@ -31,8 +23,14 @@ const App = () => {
           </PrivateRoute>
         }
       />
-
-      <Route path="info/*" element={<ItemInfo />} />
+      <Route
+        path="info/*"
+        element={
+          <PrivateRoute>
+            <ItemInfo />
+          </PrivateRoute>
+        }
+      />
       <Route path="rtl/*" element={<RtlLayout />} />
       <Route
         path="nodes/:id/config/*"
@@ -56,6 +54,7 @@ const App = () => {
       {/* <Route path="nodes/*" element={<ConfigLayout />} /> */}
 
       {/* <Route path="nodes/:id/*" element={<MerchantLayout />} /> */}
+      <Route path="*" element={<NotFound />} />
 
       <Route path="/" element={<Navigate to="admin/" replace />} />
     </Routes>

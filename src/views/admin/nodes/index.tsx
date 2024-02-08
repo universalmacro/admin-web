@@ -6,8 +6,8 @@ import { NavLink, useNavigate } from "react-router-dom";
 import ModalForm from "./modal-form";
 import * as YAML from "yaml";
 import { Configuration, ConfigurationParameters, NodeApi } from "@universalmacro/core-ts-sdk";
-import CommonTable from "components/common-table";
-// import { CommonTable } from "@macro-components/common-components";
+// import CommonTable from "components/common-table";
+import { CommonTable } from "@macro-components/common-components";
 import DownLoadNodeConfigBtn from "components/download-node-config";
 import CopyTextBtn from "components/copy-text";
 

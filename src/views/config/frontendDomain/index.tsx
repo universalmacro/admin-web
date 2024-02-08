@@ -58,7 +58,7 @@ const FrontendDomainConfig = () => {
   useEffect(() => {
     if (frontendDomain) {
       form.setFieldsValue({
-        frontendDomain,
+        ...frontendDomain,
       });
     }
   }, [frontendDomain]);
@@ -81,7 +81,7 @@ const FrontendDomainConfig = () => {
     try {
       let params = {
         id: id,
-        nodeConfig: { frontendDomain: { ...values } },
+        nodeConfig: { frontendDomain: values?.frontendDomain },
       };
       const res = await nodeApi?.updateNodeConfig({ ...params });
       if (res) {
