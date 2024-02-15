@@ -7,6 +7,8 @@ import AdminLayout from "layouts/admin";
 import AuthLayout from "layouts/auth";
 import ItemInfo from "views/info/ItemInfo";
 import ConfigLayout from "layouts/config";
+// import ConfigLayout from "layouts/common";
+
 import DetailLayout from "layouts/detail";
 
 import { NotFound } from "views/notfound";

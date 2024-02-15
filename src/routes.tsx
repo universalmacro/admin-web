@@ -183,9 +183,10 @@ const detailRoute = [
   },
 ];
 
-const testRoutes: Array<{ name: string; children: RoutesType[] }> = [
+const testRoutes: Array<{ name: string; key: string; children: RoutesType[] }> = [
   {
     name: "節點配置",
+    key: "config",
     children: [
       {
         name: "database",
@@ -231,6 +232,7 @@ const testRoutes: Array<{ name: string; children: RoutesType[] }> = [
   },
   {
     name: "帳號配置",
+    key: "account",
     children: [
       {
         name: "merchant",
