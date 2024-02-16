@@ -38,6 +38,8 @@ import { CgProfile } from "react-icons/cg";
 import { BiDetail } from "react-icons/bi";
 import Authenticator from "views/authentication/index";
 
+import { LaptopOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+
 const routes = [
   {
     name: "系统管理",
@@ -183,10 +185,11 @@ const detailRoute = [
   },
 ];
 
-const testRoutes: Array<{ name: string; key: string; children: RoutesType[] }> = [
+const testRoutes: Array<{ name: string; key: string; icon: any; children: RoutesType[] }> = [
   {
     name: "節點配置",
     key: "config",
+    icon: <LaptopOutlined />,
     children: [
       {
         name: "database",
@@ -232,6 +235,86 @@ const testRoutes: Array<{ name: string; key: string; children: RoutesType[] }> =
   },
   {
     name: "帳號配置",
+    icon: <TeamOutlined />,
+    key: "account",
+    children: [
+      {
+        name: "merchant",
+        layout: "/nodes",
+        icon: <MdOutlineSwitchAccount className="h-6 w-6" />,
+        path: "merchant",
+        component: <MerchantConfig />,
+        secondary: true,
+      },
+    ],
+  },
+];
+
+const nodeRoutes: Array<{
+  name: string;
+  key: string;
+  icon: any;
+  children?: RoutesType[];
+  component?: any;
+  path?: string;
+}> = [
+  {
+    name: "節點詳情",
+    key: "detail",
+    icon: <BiDetail className="h-4 w-4" />,
+    component: <DetailPage />,
+    path: "detail",
+  },
+  {
+    name: "節點配置",
+    key: "config",
+    icon: <LaptopOutlined />,
+    children: [
+      {
+        name: "database",
+        layout: "/nodes",
+        icon: <FaDatabase className="h-6 w-6" />,
+        path: "database",
+        component: <DatabaseConfig />,
+        secondary: true,
+      },
+      {
+        name: "server",
+        layout: "/nodes",
+        icon: <CiServer className="h-6 w-6" />,
+        path: "server",
+        component: <ServerConfig />,
+        secondary: true,
+      },
+      {
+        name: "redis",
+        layout: "/nodes",
+        icon: <SiRedis className="h-6 w-6" />,
+        path: "redis",
+        component: <RedisConfig />,
+        secondary: true,
+      },
+      {
+        name: "api",
+        layout: "/nodes",
+        icon: <TbApi className="h-6 w-6" />,
+        path: "api",
+        component: <ApiConfig />,
+        secondary: true,
+      },
+      {
+        name: "frontendDomain",
+        layout: "/nodes",
+        icon: <MdBlurLinear className="h-6 w-6" />,
+        path: "frontendDomain",
+        component: <FrontendDomainConfig />,
+        secondary: true,
+      },
+    ],
+  },
+  {
+    name: "帳號配置",
+    icon: <TeamOutlined />,
     key: "account",
     children: [
       {
@@ -248,4 +331,4 @@ const testRoutes: Array<{ name: string; key: string; children: RoutesType[] }> =
 
 export default routes;
 
-export { configRoutes, merchantsRoutes, testRoutes, detailRoute };
+export { configRoutes, merchantsRoutes, testRoutes, detailRoute, nodeRoutes };

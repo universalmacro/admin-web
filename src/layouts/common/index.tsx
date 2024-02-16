@@ -1,51 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Routes, Route, Navigate, useLocation, useParams, useNavigate } from "react-router-dom";
-import Navbar from "components/navbar";
-import Sidebar from "components/config-sidebar";
-import Footer from "components/footer/Footer";
 import { useDispatch, useSelector } from "react-redux";
-import { configRoutes } from "routes";
-import { AppDispatch } from "../../store";
-import { testRoutes } from "routes";
+import { nodeRoutes } from "routes";
 
-import { LaptopOutlined, NotificationOutlined, UserOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Breadcrumb, Layout, Menu, theme, Button } from "antd";
 
-const { Header, Content, Sider } = Layout;
+const { Header, Content, Sider, Footer } = Layout;
 
-const items1: MenuProps["items"] = ["1", "2", "3"].map((key) => ({
-  key,
-  label: `nav ${key}`,
-}));
-
-const items2: MenuProps["items"] = [UserOutlined, LaptopOutlined, NotificationOutlined].map(
-  (icon, index) => {
-    const key = String(index + 1);
-
-    return {
-      key: `sub${key}`,
-      icon: React.createElement(icon),
-      label: `subnav ${key}`,
-
-      children: new Array(4).fill(null).map((_, j) => {
-        const subKey = index * 4 + j + 1;
-        return {
-          key: subKey,
-          label: `option${subKey}`,
-        };
-      }),
-    };
-  }
-);
-
-const items3: MenuProps["items"] = testRoutes.map((item, index) => {
+const items3: MenuProps["items"] = nodeRoutes.map((item, index) => {
   return {
     key: item.key,
-    icon: React.createElement(LaptopOutlined),
+    // icon: React.createElement(item.icon),
+    icon: item.icon,
     label: item.name,
 
-    children: item.children.map((_, j) => {
+    children: item?.children?.map((_, j) => {
       const subKey = _.name;
       return {
         key: subKey,
@@ -56,22 +27,25 @@ const items3: MenuProps["items"] = testRoutes.map((item, index) => {
 });
 
 export default function Config(props: { [x: string]: any }) {
-  const { ...rest } = props;
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+  const [collapsed, setCollapsed] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(true);
   const [currentRoute, setCurrentRoute] = React.useState("database");
-  const dispatch = useDispatch<AppDispatch>();
   const { userToken } =
     useSelector((state: any) => state.auth) || localStorage.getItem("admin-web-token") || {};
   const { id: nodeId } = useParams();
 
   const onClickMenu = (route: any) => {
+    // if (route.layout == "nodes") {
     navigate("/nodes/" + nodeId + "/config/" + route.key);
+    // } else {
+    //   navigate("/nodes/" + nodeId + "/" + route.key);
+    // }
   };
 
   React.useEffect(() => {
@@ -80,54 +54,61 @@ export default function Config(props: { [x: string]: any }) {
     );
   }, []);
   React.useEffect(() => {
-    getActiveRoute(testRoutes);
+    getActiveRoute(nodeRoutes);
   }, [location.pathname]);
 
   const getActiveRoute = (routesConfig: any): string => {
     let activeRoute = "database";
     for (let j = 0; j < routesConfig?.length; j++) {
-      let routes = routesConfig?.[j].children;
-      for (let i = 0; i < routes?.length; i++) {
+      if (routesConfig?.[j]?.component) {
+        console.log(
+          "=================================",
+          window.location.href,
+          "/" + nodeId + "/config/" + routesConfig?.[j].path
+        );
         if (
-          window.location.href.indexOf(
-            routes[i].layout + "/" + nodeId + "/config/" + routes[i].path
-          ) !== -1
+          window.location.href.indexOf("/" + nodeId + "/config/" + routesConfig?.[j].path) !== -1
         ) {
-          setCurrentRoute(routes[i].name);
+          setCurrentRoute(routesConfig?.[j].key);
+        }
+      } else {
+        let routes = routesConfig?.[j].children;
+        for (let i = 0; i < routes?.length; i++) {
+          if (
+            window.location.href.indexOf(
+              routes[i].layout + "/" + nodeId + "/config/" + routes[i].path
+            ) !== -1
+          ) {
+            setCurrentRoute(routes[i].name);
+          }
         }
       }
     }
 
     return activeRoute;
   };
-  const getActiveNavbar = (routesConfig: any): string | boolean => {
-    let activeNavbar = false;
-    for (let j = 0; j < routesConfig?.length; j++) {
-      let routes = routesConfig?.[j].children;
 
-      for (let i = 0; i < routes?.length; i++) {
-        if (
-          window.location.href.indexOf(
-            routes[i].layout + "/" + nodeId + "/config/" + routes[i].path
-          ) !== -1
-        ) {
-          return routes[i].secondary;
-        }
-      }
-    }
-    return activeNavbar;
-  };
   const getRoutes = (routesConfig: any): any => {
     let routeList = [];
     for (let j = 0; j < routesConfig?.length; j++) {
+      if (routesConfig?.[j]?.component) {
+        routeList.push(
+          <Route
+            path={`${routesConfig?.[j].path}`}
+            element={routesConfig?.[j].component}
+            key={routesConfig?.[j].key}
+          />
+        );
+      } else {
+      }
       let routes = routesConfig?.[j].children;
       routeList.push(
         routes?.map((prop: any, key: any) => {
-          if (prop.layout === "/nodes") {
-            return <Route path={`${prop.path}`} element={prop.component} key={key} />;
-          } else {
-            return null;
-          }
+          // if (prop.layout === "/nodes") {
+          return <Route path={`${prop.path}`} element={prop.component} key={key} />;
+          // } else {
+          //   return null;
+          // }
         })
       );
     }
@@ -137,56 +118,81 @@ export default function Config(props: { [x: string]: any }) {
   document.documentElement.dir = "ltr";
   return (
     <>
-      <Header style={{ display: "flex", alignItems: "center" }}>
-        <div className="demo-logo" />
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={["2"]}
-          items={[]}
-          style={{ flex: 1, minWidth: 0 }}
-        />
-      </Header>
-      <div className="flex h-full w-full">
-        <Sider width={200} style={{ background: colorBgContainer }}>
+      <Layout>
+        <Sider
+          trigger={null}
+          collapsible
+          collapsed={collapsed}
+          style={{
+            overflow: "auto",
+            height: "100vh",
+          }}
+        >
+          <div className="flex justify-center p-5">
+            <img
+              src={
+                collapsed
+                  ? "https://static-1318552943.cos.ap-singapore.myqcloud.com/macro/ui/LOGO2.png"
+                  : "https://static-1318552943.cos.ap-singapore.myqcloud.com/macro/ui/LOGO.png"
+              }
+              className={collapsed ? "h-[20px]" : "h-[40px]"}
+            />
+          </div>
+
           <Menu
-            // theme="dark"
+            theme="dark"
             mode="inline"
             // defaultSelectedKeys={[currentRoute]}
             selectedKeys={[currentRoute]}
-            defaultOpenKeys={["config"]}
+            defaultOpenKeys={["config", "account"]}
             style={{ height: "100%", borderRight: 0 }}
             items={items3}
             onClick={onClickMenu}
           />
         </Sider>
-        {/* <Sidebar open={open} onClose={() => setOpen(false)} routeConifg={testRoutes} /> */}
-        {/* Navbar & Main Content */}
-        <div className="h-full w-full bg-lightPrimary dark:!bg-navy-900">
-          {/* Main Content */}
-          {/* <main className={`mx-[12px] h-full flex-none transition-all md:pr-2 xl:ml-[230px]`}> */}
-          {/* Routes */}
-          <div className="h-full">
-            {/* <Navbar
-                onOpenSidenav={() => setOpen(true)}
-                brandText={currentRoute}
-                secondary={getActiveNavbar(testRoutes)}
-                {...rest}
-              /> */}
-            <div className="pt-5s mx-auto mb-auto h-full min-h-[84vh] p-4 md:pr-2">
-              <Routes>
-                {getRoutes(testRoutes)}
 
-                <Route path="/" element={<Navigate to="/admin/nodes" replace />} />
-              </Routes>
-            </div>
-            <div className="p-3">
-              <Footer />
-            </div>
-          </div>
-          {/* </main> */}
-        </div>
-      </div>
+        <Layout>
+          <Header style={{ padding: 0, background: colorBgContainer }}>
+            <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+              onClick={() => setCollapsed(!collapsed)}
+              style={{
+                fontSize: "16px",
+                width: 64,
+                height: 64,
+              }}
+            />
+          </Header>
+          <Breadcrumb style={{ margin: "16px" }}>
+            <Breadcrumb.Item href="/admin/nodes">配置</Breadcrumb.Item>
+            <Breadcrumb.Item>{currentRoute}</Breadcrumb.Item>
+          </Breadcrumb>
+          <Content
+            style={{
+              margin: "24px 16px",
+              padding: 24,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
+            <Routes>
+              {getRoutes(nodeRoutes)}
+
+              <Route path="/" element={<Navigate to="/admin/nodes" replace />} />
+            </Routes>
+          </Content>
+          <Footer style={{ textAlign: "center" }}>
+            Universal Macro ©{new Date().getFullYear()}
+          </Footer>
+        </Layout>
+        {/* </div> */}
+        {/* </main> */}
+        {/* </div> */}
+      </Layout>
+
+      {/* </div> */}
     </>
   );
 }
