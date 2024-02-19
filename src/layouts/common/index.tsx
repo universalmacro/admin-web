@@ -130,12 +130,14 @@ export default function Config(props: { [x: string]: any }) {
         >
           <div className="flex justify-center p-5">
             <img
+              onClick={() => navigate("/")}
+              alt="巨集科技"
               src={
                 collapsed
                   ? "https://static-1318552943.cos.ap-singapore.myqcloud.com/macro/ui/LOGO2.png"
                   : "https://static-1318552943.cos.ap-singapore.myqcloud.com/macro/ui/LOGO.png"
               }
-              className={collapsed ? "h-[20px]" : "h-[40px]"}
+              className={collapsed ? "h-[20px] cursor-pointer" : "h-[40px] cursor-pointer"}
             />
           </div>
 
@@ -145,7 +147,7 @@ export default function Config(props: { [x: string]: any }) {
             // defaultSelectedKeys={[currentRoute]}
             selectedKeys={[currentRoute]}
             defaultOpenKeys={["config", "account"]}
-            style={{ height: "100%", borderRight: 0 }}
+            style={{ borderRight: 0 }}
             items={items3}
             onClick={onClickMenu}
           />
