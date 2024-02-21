@@ -107,7 +107,7 @@ const ServerConfig = () => {
             <p className="mb-4 inline text-xl">Server 配置</p>{" "}
           </div>
 
-          <div className="mt-5 flex grid h-full grid-cols-1 items-center justify-center gap-5 rounded-lg bg-white p-8">
+          <div className=" flex grid  grid-cols-1 items-center justify-center">
             <Checkbox
               checked={!componentDisabled}
               onChange={(e: any) => setComponentDisabled(!e.target.checked)}

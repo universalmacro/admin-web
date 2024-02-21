@@ -118,7 +118,7 @@ export default function Config(props: { [x: string]: any }) {
   document.documentElement.dir = "ltr";
   return (
     <>
-      <Layout>
+      <Layout hasSider style={{ minHeight: "100vh" }}>
         <Sider
           trigger={null}
           collapsible
@@ -126,6 +126,10 @@ export default function Config(props: { [x: string]: any }) {
           style={{
             overflow: "auto",
             height: "100vh",
+            position: "fixed",
+            left: 0,
+            top: 0,
+            bottom: 0,
           }}
         >
           <div className="flex justify-center p-5">
@@ -153,7 +157,7 @@ export default function Config(props: { [x: string]: any }) {
           />
         </Sider>
 
-        <Layout>
+        <Layout style={{ marginLeft: 200 }}>
           <Header style={{ padding: 0, background: colorBgContainer }}>
             <Button
               type="text"
@@ -172,18 +176,25 @@ export default function Config(props: { [x: string]: any }) {
           </Breadcrumb>
           <Content
             style={{
-              margin: "24px 16px",
-              padding: 24,
-              minHeight: 280,
+              margin: "24px 16px 0",
+              overflow: "initial",
               background: colorBgContainer,
               borderRadius: borderRadiusLG,
             }}
           >
-            <Routes>
-              {getRoutes(nodeRoutes)}
+            <div
+              style={{
+                padding: 24,
+                // background: colorBgContainer,
+                // borderRadius: borderRadiusLG,
+              }}
+            >
+              <Routes>
+                {getRoutes(nodeRoutes)}
 
-              <Route path="/" element={<Navigate to="/admin/nodes" replace />} />
-            </Routes>
+                <Route path="/" element={<Navigate to="/admin/nodes" replace />} />
+              </Routes>
+            </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>
             Universal Macro ©{new Date().getFullYear()}
