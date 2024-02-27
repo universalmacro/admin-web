@@ -58,7 +58,7 @@ const FrontendDomainConfig = () => {
   useEffect(() => {
     if (frontendDomain) {
       form.setFieldsValue({
-        ...frontendDomain,
+        frontendDomain: frontendDomain,
       });
     }
   }, [frontendDomain]);
